@@ -14,10 +14,13 @@ class MainViewModel : ViewModel() {
     val addControlCircleLiveData = MutableLiveData<ControlData>()
     val moveJetLiveData = MutableLiveData<JetMoveData>()
     val moveTargetLiveData = MutableLiveData<TargetMoveData>()
+
     private var jetX = 0f
     private var jetY = 0f
+
     private var targetX = 0f
     private var targetY = 0f
+
     private var controlLeft = 0f
     private var controlRight = 0f
     private var controlTop = 0f
@@ -26,16 +29,27 @@ class MainViewModel : ViewModel() {
     private var targetStartX = 0f
     private var targetStartY = 0f
 
+    private var jetMoveX = 0f
+    private var jetMoveY = 0f
 
+    private var jetWidth = 0
+    private var jetHeight = 0
 
     fun onAddControlCircleListener(isShow: Boolean, x: Float, y: Float) {
-        MichaelLog.i("isShow $isShow")
         addControlCircleLiveData.value = ControlData(isShow,x,y)
     }
 
     fun onMoveJefListener(rawX: Float, rawY: Float, jetWidth: Int, jetHeight: Int) {
+        this.jetHeight = jetHeight
+        this.jetWidth = jetWidth
         val jetMoveX = rawX + jetX
         val jetMoveY = rawY + jetY
+        moveJet(jetMoveX,jetMoveY)
+
+    }
+
+    private fun moveJet(jetMoveX: Float, jetMoveY: Float) {
+        MichaelLog.i("jetX : $jetMoveX , jetY : $jetMoveY")
 
         if ((jetMoveX + jetWidth) > UITool.getScreenWidth()){
             return
@@ -46,7 +60,6 @@ class MainViewModel : ViewModel() {
         if ((jetMoveY + jetHeight) > UITool.getScreenHeight()){
             return
         }
-        MichaelLog.i("jet x : ${(jetMoveY + jetWidth)} , screen height : ${UITool.getScreenHeight()}")
 
         if (jetMoveY < 0){
             return
@@ -63,16 +76,30 @@ class MainViewModel : ViewModel() {
         val moveX = rawX + targetX
         val moveY = rawY + targetY
 
+        if (targetStartX == 0f && targetStartY == 0f){
+            targetStartX = moveX
+            targetStartY = moveY
+        }else{
+            targetStartX = moveX - targetStartX
+            targetStartY = moveY - targetStartY
+        }
+
         if (moveY < controlTop){
+            moveJet(jetMoveX + targetStartX , jetMoveY + targetStartY)
             return
         }
         if ((moveY + targetHeight) > controlBottom){
+            moveJet(jetMoveX + targetStartX , jetMoveY + targetStartY)
+
             return
         }
         if ((moveX + targetWidth) > controlRight){
+            moveJet(jetMoveX + targetStartX , jetMoveY + targetStartY)
+
             return
         }
         if (moveX < controlLeft){
+            moveJet(jetMoveX + targetStartX , jetMoveY + targetStartY)
             return
         }
 
@@ -87,7 +114,6 @@ class MainViewModel : ViewModel() {
     }
 
     fun setControlViewWidthHeight(controlLeft: Float, controlTop: Float, right: Float, bottom: Float) {
-        MichaelLog.i("left : $controlLeft , right : $right , top : $controlTop , bottom : $bottom")
         this.controlLeft = controlLeft
         this.controlTop = controlTop
         this.controlRight = right

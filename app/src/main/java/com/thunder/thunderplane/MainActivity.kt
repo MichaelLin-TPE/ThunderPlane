@@ -31,10 +31,7 @@ class MainActivity : AppCompatActivity() {
         dataBinding.vm = viewModel
         dataBinding.lifecycleOwner = this
 
-
-
         dataBinding.root.setOnTouchListener(onTouchListener)
-
 
         //設定圈圈
         viewModel.addControlCircleLiveData.observe(this) {
@@ -62,7 +59,6 @@ class MainActivity : AppCompatActivity() {
             dataBinding.circleTarget.x = it.x - targetRadius
             dataBinding.circleTarget.y = it.y - targetRadius
             dataBinding.circleTarget.visibility = View.VISIBLE
-            MichaelLog.i("x ${it.x - targetRadius} , y : ${it.y - targetRadius}")
 
             dataBinding.circleTarget.post {
                 x = dataBinding.circleTarget.x - rawX
