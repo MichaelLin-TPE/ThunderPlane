@@ -46,7 +46,6 @@ class MainViewModel : ViewModel() {
         if ((jetMoveY + jetHeight) > UITool.getScreenHeight()){
             return
         }
-        MichaelLog.i("jet x : ${(jetMoveY + jetWidth)} , screen height : ${UITool.getScreenHeight()}")
 
         if (jetMoveY < 0){
             return
