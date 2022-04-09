@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.Animation
@@ -43,7 +42,18 @@ class MainActivity : AppCompatActivity() {
         dataBinding.vm = viewModel
         dataBinding.lifecycleOwner = this
         appearUFO()
-        startShooting()
+//        startShooting()
+
+
+        viewModel.startShooting()
+
+        viewModel.bulletLiveData.observe(this){
+            dataBinding.root.addView(it)
+            viewModel.bulletMoveLiveData.observe(this){moveData->
+                it.x = moveData.jetX
+                it.y = moveData.jetY
+            }
+        }
 
         dataBinding.root.setOnTouchListener(onTouchListener)
 
@@ -164,7 +174,11 @@ class MainActivity : AppCompatActivity() {
                     event.rawX,
                     event.rawY,
                     dataBinding.jet.width,
-                    dataBinding.jet.height
+                    dataBinding.jet.height,
+                    dataBinding.jet.right,
+                    dataBinding.jet.left,
+                    dataBinding.jet.top,
+                    dataBinding.jet.bottom
                 )
             }
         }
