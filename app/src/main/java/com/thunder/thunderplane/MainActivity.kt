@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
@@ -20,9 +21,11 @@ import com.thunder.thunderplane.bean.UFOData
 import com.thunder.thunderplane.databinding.ActivityMainBinding
 import com.thunder.thunderplane.log.MichaelLog
 import com.thunder.thunderplane.tool.UITool
+import com.thunder.thunderplane.tool.UITool.getPixel
 import com.thunder.thunderplane.tool.UITool.getRandomBackground
 import com.thunder.thunderplane.wedgit.RandomBgView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -212,7 +215,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun playGunSound() {
         mPlayer?.start()
-
     }
 
     private fun checkBulletHitUFO(view: View) {
@@ -224,11 +226,39 @@ class MainActivity : AppCompatActivity() {
                 view.x >= ufoData.ufo.x &&
                 view.x <= (ufoData.ufo.x + (ufoData.ufo.right - ufoData.ufo.left))
             ) {
+                createExplodeView(view.x,view.y)
                 dataBinding.root.removeView(ufoData.ufo)
                 deleteBullet(view)
                 ufoIterator.remove()
             }
         }
+    }
+
+    private fun createExplodeView(x: Float, y: Float) {
+        val view = View.inflate(this,R.layout.explode_layout,null)
+
+        dataBinding.root.addView(view)
+        view.visibility = View.INVISIBLE
+        view.post {
+            setExplodeSize(view)
+            view.x = x
+            view.y = y
+            Log.i("Michael","x : $x , y : $y")
+            view.visibility = View.VISIBLE
+            lifecycleScope.launch(Dispatchers.IO) {
+                delay(1000)
+                lifecycleScope.launch(Dispatchers.Main) {
+                    dataBinding.root.removeView(view)
+                }
+            }
+        }
+    }
+
+    private fun setExplodeSize(view: View) {
+        val layoutParams = view.layoutParams
+        layoutParams.width = this.getPixel(50)
+        layoutParams.width = this.getPixel(50)
+        view.layoutParams = layoutParams
     }
 
     //更新子彈數據

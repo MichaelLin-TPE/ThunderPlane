@@ -1,10 +1,10 @@
 package com.thunder.thunderplane.tool
 
 import android.content.Context
-import android.util.DisplayMetrics
-import android.view.View
+import android.util.TypedValue
 import com.thunder.thunderplane.MyApplication
 import com.thunder.thunderplane.R
+import kotlin.math.roundToInt
 
 object UITool {
 
@@ -22,5 +22,11 @@ object UITool {
         return viewList[(0 until viewList.size).random()]
     }
 
+    fun Context.getPixel(dp: Int) : Int {
+       return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(),
+            this.resources.displayMetrics
+        ).roundToInt()
+    }
 
 }
