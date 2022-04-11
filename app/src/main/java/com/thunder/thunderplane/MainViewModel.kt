@@ -17,6 +17,9 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
     private var jetX = 0f
     private var jetY = 0f
 
+    private val _scoreLiveData = MutableLiveData<Long>(0)
+    private val currentScore get() =  _scoreLiveData.value!!
+    val scoreLiveData : LiveData<Long> = _scoreLiveData
 
     fun onMoveJefListener(
         rawX: Float,
@@ -50,6 +53,11 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
     fun setJetXY(jetX: Float, jetY: Float) {
         this.jetX = jetX
         this.jetY = jetY
+    }
+
+    fun addScore(score: Int) {
+        val num = currentScore + score
+        _scoreLiveData.value = num
     }
 
     class MainViewModelFactory(private val mainRepository: MainRepository) : ViewModelProvider.Factory {
