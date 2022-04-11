@@ -239,8 +239,8 @@ class MainActivity : AppCompatActivity() {
 
         dataBinding.root.addView(view)
         view.visibility = View.INVISIBLE
+        setExplodeSize(view)
         view.post {
-            setExplodeSize(view)
             view.x = x
             view.y = y
             Log.i("Michael","x : $x , y : $y")
@@ -256,8 +256,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setExplodeSize(view: View) {
         val layoutParams = view.layoutParams
-        layoutParams.width = this.getPixel(50)
-        layoutParams.width = this.getPixel(50)
+        layoutParams.width = this.getPixel(60)
+        layoutParams.width = this.getPixel(60)
         view.layoutParams = layoutParams
     }
 
