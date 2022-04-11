@@ -115,11 +115,13 @@ class MainActivity : AppCompatActivity() {
             override fun run() {
                 val ufo = View.inflate(this@MainActivity, R.layout.ufo_layout, null)
                 dataBinding.root.addView(ufo)
+                ufo.visibility = View.INVISIBLE
                 ufo.post {
                     ufo.x =
                         (0..(UITool.getScreenWidth() - (ufo.right - ufo.left))).random().toFloat()
                     ufo.y = 100f
                     ufo.tag = ufoIndex
+                    ufo.visibility = View.VISIBLE
                     val data = UFOData(ufo, isRight = true, isTop = false)
                     ufoList.add(data)
                     moveUFO(data)

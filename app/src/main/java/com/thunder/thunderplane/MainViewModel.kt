@@ -8,10 +8,6 @@ import com.thunder.thunderplane.bean.JetMoveData
 import com.thunder.thunderplane.bean.TargetMoveData
 import com.thunder.thunderplane.log.MichaelLog
 import com.thunder.thunderplane.tool.UITool
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 
 class MainViewModel(val repository: MainRepository) : ViewModel() {
 
@@ -55,9 +51,6 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
         this.jetX = jetX
         this.jetY = jetY
     }
-
-
-
 
     class MainViewModelFactory(private val mainRepository: MainRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
