@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
                                     handler.removeCallbacks(this)
                                     return
                                 }
-                                dataBinding.bgRoot.y = dataBinding.bgRoot.y + 1f
+                                dataBinding.bgRoot.y = dataBinding.bgRoot.y + 5f
 
                                 handler.postDelayed(this, 1)
                             }
@@ -214,6 +214,7 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 if (isHitUser(bullet)){
+
                     isGameOver = true
                     dataBinding.root.removeView(bullet)
                     handler.removeCallbacks(this)
