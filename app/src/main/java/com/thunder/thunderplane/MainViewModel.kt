@@ -60,6 +60,10 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
         _scoreLiveData.value = num
     }
 
+    fun reStartScore() {
+        _scoreLiveData.value = 0
+    }
+
     class MainViewModelFactory(private val mainRepository: MainRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return MainViewModel(mainRepository) as T

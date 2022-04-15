@@ -5,7 +5,9 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.View
 import android.view.Window
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import com.thunder.thunderplane.R
@@ -35,15 +37,29 @@ class GameOverDialog : DialogFragment() {
         val dialog = Dialog(fragmentActivity)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(view)
-
+        initView(view)
         dialog.setCancelable(false)
         val window = dialog.window
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val wlp = window?.attributes
-        wlp?.width = fragmentActivity.getPixel(300)
-        wlp?.height = fragmentActivity.getPixel(150)
+        wlp?.width = fragmentActivity.getPixel(350)
+        wlp?.height = fragmentActivity.getPixel(200)
         window?.attributes = wlp
         return dialog
+    }
+
+    private fun initView(view: View) {
+        val gameOver = view.findViewById<ConstraintLayout>(R.id.game_over_close)
+        val restart = view.findViewById<ConstraintLayout>(R.id.game_over_restart)
+
+        gameOver.setOnClickListener {
+            onGameOverDialogClickListener.onCloseGame()
+            dismiss()
+        }
+        restart.setOnClickListener {
+            onGameOverDialogClickListener.onRestartGame()
+            dismiss()
+        }
     }
 
 

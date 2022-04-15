@@ -16,20 +16,26 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.thunder.thunderplane.base.BaseActivity
 import com.thunder.thunderplane.bean.BulletData
 import com.thunder.thunderplane.bean.UFOData
 import com.thunder.thunderplane.bean.UfoBulletData
 import com.thunder.thunderplane.databinding.ActivityMainBinding
+import com.thunder.thunderplane.dialog.GameOverDialog
 import com.thunder.thunderplane.log.MichaelLog
 import com.thunder.thunderplane.tool.UITool
 import com.thunder.thunderplane.tool.UITool.getPixel
 import com.thunder.thunderplane.tool.UITool.getRandomBackground
+import com.thunder.thunderplane.tool.ViewTool.getExplodeView
+import com.thunder.thunderplane.tool.ViewTool.getJetBullet
+import com.thunder.thunderplane.tool.ViewTool.getRandomUFOView
+import com.thunder.thunderplane.tool.ViewTool.getUFoBullet
 import com.thunder.thunderplane.wedgit.RandomBgView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private lateinit var dataBinding: ActivityMainBinding
 
@@ -92,11 +98,14 @@ class MainActivity : AppCompatActivity() {
                 }
                 view.post{
                     viewSetting(view)
+                    view.visibility = View.INVISIBLE
                     val data = BgData(view,view.x,view.y)
                     bgList.add(data)
-                    MichaelLog.i("x : ${view.x} , y : ${view.y}")
                     if (bgList.size == 201){
                         dataBinding.scrollView.scrollTo(0,bgList[bgList.size - 1].y.toInt())
+                        bgList.forEach{
+                            it.view.visibility = View.VISIBLE
+                        }
                         MichaelLog.i("viewCount : ${dataBinding.bgRoot.childCount}")
                         handler.postDelayed(object : Runnable {
                             override fun run() {
@@ -131,7 +140,7 @@ class MainActivity : AppCompatActivity() {
                     handler.removeCallbacks(this)
                     return
                 }
-                val ufo = View.inflate(this@MainActivity, R.layout.ufo_layout, null)
+                val ufo = this@MainActivity.getRandomUFOView()
                 dataBinding.root.addView(ufo)
                 ufo.visibility = View.INVISIBLE
                 ufo.post {
@@ -147,9 +156,9 @@ class MainActivity : AppCompatActivity() {
                 }
                 ufoIndex++
                 handler.removeCallbacks(this)
-                handler.postDelayed(this, 1000)
+                handler.postDelayed(this, 500)
             }
-        }, 1000)
+        }, 500)
 
     }
 
@@ -174,7 +183,7 @@ class MainActivity : AppCompatActivity() {
                     handler.removeCallbacks(this)
                     return
                 }
-                val bullet = View.inflate(this@MainActivity,R.layout.bullet_layout,null)
+                val bullet = this@MainActivity.getUFoBullet()
                 dataBinding.root.addView(bullet)
                 bullet.visibility = View.INVISIBLE
                 bullet.post {
@@ -214,7 +223,7 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 if (isHitUser(bullet)){
-
+                    showGameOver()
                     isGameOver = true
                     dataBinding.root.removeView(bullet)
                     handler.removeCallbacks(this)
@@ -224,6 +233,22 @@ class MainActivity : AppCompatActivity() {
                 handler.postDelayed(this, 1)
             }
         }, 1)
+    }
+
+    private fun showGameOver() {
+        showGameOverDialog(object :GameOverDialog.OnGameOverDialogClickListener{
+            override fun onCloseGame() {
+                finish()
+            }
+
+            override fun onRestartGame() {
+                isGameOver = false
+                viewModel.reStartScore()
+                initView()
+                appearUFO()
+                startShooting()
+            }
+        })
     }
 
     private fun isHitUser(bullet: View): Boolean =
@@ -288,7 +313,7 @@ class MainActivity : AppCompatActivity() {
                     handler.removeCallbacks(this)
                     return
                 }
-                val view = View.inflate(this@MainActivity, R.layout.bullet_layout, null)
+                val view = this@MainActivity.getJetBullet()
                 view.tag = bulletIndex
                 dataBinding.root.addView(view)
                 view.post {
@@ -344,7 +369,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createExplodeView(x: Float, y: Float) {
-        val view = View.inflate(this,R.layout.explode_layout,null)
+        val view = this.getExplodeView()
 
         dataBinding.root.addView(view)
         view.visibility = View.INVISIBLE
