@@ -8,28 +8,24 @@ import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.widget.Button
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.thunder.thunderplane.base.BaseActivity
 import com.thunder.thunderplane.bean.BulletData
 import com.thunder.thunderplane.bean.UFOData
-import com.thunder.thunderplane.bean.UfoBulletData
+import com.thunder.thunderplane.bean.UpgradeItemData
 import com.thunder.thunderplane.databinding.ActivityMainBinding
 import com.thunder.thunderplane.dialog.GameOverDialog
 import com.thunder.thunderplane.log.MichaelLog
 import com.thunder.thunderplane.tool.UITool
-import com.thunder.thunderplane.tool.UITool.getPixel
-import com.thunder.thunderplane.tool.UITool.getRandomBackground
+import com.thunder.thunderplane.tool.ViewTool
+import com.thunder.thunderplane.tool.ViewTool.BULLET_LEVEL_1
 import com.thunder.thunderplane.tool.ViewTool.getExplodeView
 import com.thunder.thunderplane.tool.ViewTool.getJetBullet
 import com.thunder.thunderplane.tool.ViewTool.getRandomUFOView
 import com.thunder.thunderplane.tool.ViewTool.getUFoBullet
+import com.thunder.thunderplane.tool.ViewTool.getUpgradeItem
 import com.thunder.thunderplane.wedgit.RandomBgView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -44,6 +40,7 @@ class MainActivity : BaseActivity() {
     private val handler = Handler(Looper.myLooper()!!)
     private val bulletList = ArrayList<BulletData>()
     private val ufoList = ArrayList<UFOData>()
+    private val upgradeItemList = ArrayList<UpgradeItemData>()
     private var bulletIndex = 0
     private var ufoIndex = 0
     private var mPlayer: MediaPlayer? = null
@@ -63,6 +60,8 @@ class MainActivity : BaseActivity() {
         dataBinding.vm = viewModel
         dataBinding.lifecycleOwner = this
         mPlayer = MediaPlayer.create(this, R.raw.gun_shot)
+        //一開始飛機的子彈為最小化
+        dataBinding.jet.tag = BULLET_LEVEL_1
         initView()
 
 
@@ -81,7 +80,7 @@ class MainActivity : BaseActivity() {
             dataBinding.jet.y = it.jetY
         }
 
-        viewModel.scoreLiveData.observe(this){
+        viewModel.scoreLiveData.observe(this) {
             dataBinding.score.text = "score : $it"
         }
 
@@ -89,27 +88,27 @@ class MainActivity : BaseActivity() {
 
     private fun initView() {
 
-        lifecycleScope.launch(Dispatchers.IO){
+        lifecycleScope.launch(Dispatchers.IO) {
             val bgList = ArrayList<BgData>()
-            for( i in 0..200){
+            for (i in 0..200) {
                 val view = RandomBgView(this@MainActivity)
                 lifecycleScope.launch {
                     dataBinding.bgRoot.addView(view)
                 }
-                view.post{
+                view.post {
                     viewSetting(view)
                     view.visibility = View.INVISIBLE
-                    val data = BgData(view,view.x,view.y)
+                    val data = BgData(view, view.x, view.y)
                     bgList.add(data)
-                    if (bgList.size == 201){
-                        dataBinding.scrollView.scrollTo(0,bgList[bgList.size - 1].y.toInt())
-                        bgList.forEach{
+                    if (bgList.size == 201) {
+                        dataBinding.scrollView.scrollTo(0, bgList[bgList.size - 1].y.toInt())
+                        bgList.forEach {
                             it.view.visibility = View.VISIBLE
                         }
                         MichaelLog.i("viewCount : ${dataBinding.bgRoot.childCount}")
                         handler.postDelayed(object : Runnable {
                             override fun run() {
-                                if (isGameOver){
+                                if (isGameOver) {
                                     handler.removeCallbacks(this)
                                     return
                                 }
@@ -135,8 +134,9 @@ class MainActivity : BaseActivity() {
     private fun appearUFO() {
         handler.postDelayed(object : Runnable {
             override fun run() {
-                if (isGameOver){
+                if (isGameOver) {
                     clearAllUFO()
+                    clearUpgradeItem()
                     handler.removeCallbacks(this)
                     return
                 }
@@ -162,9 +162,16 @@ class MainActivity : BaseActivity() {
 
     }
 
+    private fun clearUpgradeItem() {
+        upgradeItemList.forEach {
+            dataBinding.root.removeView(it.updateItem)
+        }
+        upgradeItemList.clear()
+    }
+
     private fun clearAllUFO() {
         val ufoIterator = ufoList.iterator()
-        while (ufoIterator.hasNext()){
+        while (ufoIterator.hasNext()) {
             val data = ufoIterator.next()
             dataBinding.root.removeView(data.ufo)
             ufoIterator.remove()
@@ -173,13 +180,13 @@ class MainActivity : BaseActivity() {
 
     private fun shootUser(ufo: View) {
 
-        handler.postDelayed(object : Runnable{
+        handler.postDelayed(object : Runnable {
             override fun run() {
-                if (isGameOver){
+                if (isGameOver) {
                     handler.removeCallbacks(this)
                     return
                 }
-                if (isUFODestroy(ufo)){
+                if (isUFODestroy(ufo)) {
                     handler.removeCallbacks(this)
                     return
                 }
@@ -187,24 +194,25 @@ class MainActivity : BaseActivity() {
                 dataBinding.root.addView(bullet)
                 bullet.visibility = View.INVISIBLE
                 bullet.post {
-                    bullet.x = (ufo.x + ((ufo.right - ufo.left) / 2)) - ((bullet.right - bullet.left) / 2)
+                    bullet.x =
+                        (ufo.x + ((ufo.right - ufo.left) / 2)) - ((bullet.right - bullet.left) / 2)
                     bullet.y = ufo.y + (ufo.bottom - ufo.top)
                     bullet.visibility = View.VISIBLE
                     moveUFOBullet(bullet)
                 }
                 handler.removeCallbacks(this)
-                handler.postDelayed(this,1000)
+                handler.postDelayed(this, 1000)
             }
 
-        },1000)
+        }, 1000)
 
 
     }
 
     private fun isUFODestroy(ufo: View): Boolean {
-       var isDestroy = true
+        var isDestroy = true
         ufoList.forEach {
-            if (it.ufo.tag == ufo.tag){
+            if (it.ufo.tag == ufo.tag) {
                 isDestroy = false
             }
         }
@@ -217,12 +225,12 @@ class MainActivity : BaseActivity() {
         handler.postDelayed(object : Runnable {
             override fun run() {
                 bullet.y = bullet.y + 10f
-                if (bullet.y >= UITool.getScreenHeight()){
+                if (bullet.y >= UITool.getScreenHeight()) {
                     dataBinding.root.removeView(bullet)
                     handler.removeCallbacks(this)
                     return
                 }
-                if (isHitUser(bullet)){
+                if (isHitUser(bullet)) {
                     showGameOver()
                     isGameOver = true
                     dataBinding.root.removeView(bullet)
@@ -236,7 +244,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showGameOver() {
-        showGameOverDialog(object :GameOverDialog.OnGameOverDialogClickListener{
+        showGameOverDialog(object : GameOverDialog.OnGameOverDialogClickListener {
             override fun onCloseGame() {
                 finish()
             }
@@ -253,15 +261,15 @@ class MainActivity : BaseActivity() {
 
     private fun isHitUser(bullet: View): Boolean =
         bullet.x >= dataBinding.jet.x &&
-        bullet.x <= (dataBinding.jet.x + (dataBinding.jet.right - dataBinding.jet.left)) &&
-        bullet.y >= dataBinding.jet.y + 20f &&
-        bullet.y <= (dataBinding.jet.y + (dataBinding.jet.bottom - dataBinding.jet.top))
+                bullet.x <= (dataBinding.jet.x + (dataBinding.jet.right - dataBinding.jet.left)) &&
+                bullet.y >= dataBinding.jet.y + 20f &&
+                bullet.y <= (dataBinding.jet.y + (dataBinding.jet.bottom - dataBinding.jet.top))
 
 
     private fun moveUFO(data: UFOData) {
         handler.postDelayed(object : Runnable {
             override fun run() {
-                if (isGameOver){
+                if (isGameOver) {
                     handler.removeCallbacks(this)
                     return
                 }
@@ -283,7 +291,7 @@ class MainActivity : BaseActivity() {
 
         handler.postDelayed(object : Runnable {
             override fun run() {
-                if (isGameOver){
+                if (isGameOver) {
                     handler.removeCallbacks(this)
                     return
                 }
@@ -309,11 +317,11 @@ class MainActivity : BaseActivity() {
     private fun startShooting() {
         handler.postDelayed(object : Runnable {
             override fun run() {
-                if (isGameOver){
+                if (isGameOver) {
                     handler.removeCallbacks(this)
                     return
                 }
-                val view = this@MainActivity.getJetBullet()
+                val view = this@MainActivity.getJetBullet(dataBinding.jet.tag)
                 view.tag = bulletIndex
                 dataBinding.root.addView(view)
                 view.post {
@@ -331,6 +339,7 @@ class MainActivity : BaseActivity() {
                                 handler.removeCallbacks(this)
                                 return
                             }
+
                             updateBulletData(view)
                             checkBulletHitUFO(view)
                             handler.postDelayed(this, 50)
@@ -359,13 +368,101 @@ class MainActivity : BaseActivity() {
                 view.x >= ufoData.ufo.x &&
                 view.x <= (ufoData.ufo.x + (ufoData.ufo.right - ufoData.ufo.left))
             ) {
-                createExplodeView(view.x,view.y)
+                createRandomUpgradeItem(view.x, view.y)
+                createExplodeView(view.x, view.y)
                 dataBinding.root.removeView(ufoData.ufo)
                 deleteBullet(view)
                 ufoIterator.remove()
                 viewModel.addScore(100)
             }
         }
+    }
+
+    /**
+     * 機率性產生升級
+     */
+    private fun createRandomUpgradeItem(x: Float, y: Float) {
+        if (!UITool.isCreateUpgradeItem()) {
+            return
+        }
+        val view = this.getUpgradeItem()
+        dataBinding.root.addView(view)
+        view.visibility = View.INVISIBLE
+        view.post {
+            view.x = x
+            view.y = y
+            view.visibility = View.VISIBLE
+            val data = UpgradeItemData(view,isRight = true,isTop = false)
+            upgradeItemList.add(data)
+            moveUpgradeItem(data)
+        }
+
+    }
+
+    private fun moveUpgradeItem(data: UpgradeItemData) {
+
+        handler.postDelayed(object : Runnable{
+            override fun run() {
+
+                if (data.updateItem.x > dataBinding.jet.x &&
+                        data.updateItem.x <= (dataBinding.jet.x + (dataBinding.jet.right - dataBinding.jet.left)) &&
+                        data.updateItem.y > dataBinding.jet.y &&
+                        data.updateItem.y <= (dataBinding.jet.y + (dataBinding.jet.bottom - dataBinding.jet.top))){
+
+                    dataBinding.root.removeView(data.updateItem)
+                    upgradeItemList.remove(data)
+                    dataBinding.jet.tag = ViewTool.upgradeBulletLevel(dataBinding.jet.tag)
+                    handler.removeCallbacks(this)
+                    return
+                }
+                handler.removeCallbacks(this)
+                handler.postDelayed(this,1)
+            }
+        },1)
+
+
+        handler.postDelayed(object : Runnable {
+            override fun run() {
+                if (isGameOver) {
+                    handler.removeCallbacks(this)
+                    return
+                }
+                if (data.isRight) {
+                    data.updateItem.x = data.updateItem.x + 1f
+                } else {
+                    data.updateItem.x = data.updateItem.x - 1f
+                }
+                if ((data.updateItem.x + (data.updateItem.right - data.updateItem.left)) >= UITool.getScreenWidth()) {
+                    data.isRight = false
+                }
+                if (data.updateItem.x <= 0) {
+                    data.isRight = true
+                }
+                handler.removeCallbacks(this)
+                handler.postDelayed(this, 1)
+            }
+        }, 1)
+
+        handler.postDelayed(object : Runnable {
+            override fun run() {
+                if (isGameOver) {
+                    handler.removeCallbacks(this)
+                    return
+                }
+                if (!data.isTop) {
+                    data.updateItem.y = data.updateItem.y + 10f
+                } else {
+                    data.updateItem.y = data.updateItem.y - 10f
+                }
+                if ((data.updateItem.y + (data.updateItem.bottom - data.updateItem.top)) >= UITool.getScreenHeight()) {
+                    data.isTop = true
+                }
+                if (data.updateItem.y <= 0) {
+                    data.isTop = false
+                }
+                handler.postDelayed(this, 1)
+            }
+        }, 1)
     }
 
     private fun createExplodeView(x: Float, y: Float) {
@@ -376,7 +473,7 @@ class MainActivity : BaseActivity() {
         view.post {
             view.x = x
             view.y = y
-            Log.i("Michael","x : $x , y : $y")
+            Log.i("Michael", "x : $x , y : $y")
             view.visibility = View.VISIBLE
             lifecycleScope.launch(Dispatchers.IO) {
                 delay(1000)

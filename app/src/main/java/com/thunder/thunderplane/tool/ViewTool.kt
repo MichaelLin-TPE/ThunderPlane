@@ -7,6 +7,14 @@ import com.thunder.thunderplane.R
 
 object ViewTool {
 
+    val BULLET_LEVEL_1 = 111
+    val BULLET_LEVEL_2 = 222
+    val BULLET_LEVEL_3 = 333
+    val BULLET_LEVEL_4 = 4444
+
+    fun Activity.getUpgradeItem(): View {
+        return View.inflate(this, R.layout.upgrade_item_layout, null)
+    }
 
     fun Activity.getRandomUFOView(): View {
         val viewList = mutableListOf<Int>()
@@ -25,12 +33,42 @@ object ViewTool {
         return View.inflate(this, R.layout.ufo_bullet_layout, null)
     }
 
-    fun Activity.getJetBullet(): View {
-        return View.inflate(this, R.layout.bullet_layout, null)
+    fun Activity.getJetBullet(tag: Any): View {
+        return when (tag) {
+            BULLET_LEVEL_1 -> {
+                View.inflate(this, R.layout.bullet_layout, null)
+            }
+            BULLET_LEVEL_2 -> {
+                View.inflate(this, R.layout.bullet_level2_layout, null)
+            }
+            BULLET_LEVEL_3 -> {
+                View.inflate(this, R.layout.bullet_level3_layout, null)
+            }
+            else -> {
+                View.inflate(this, R.layout.bullet_level4_layout, null)
+            }
+        }
     }
 
-    fun Activity.getExplodeView():View{
-        return View.inflate(this,R.layout.explode_layout,null)
+    fun Activity.getExplodeView(): View {
+        return View.inflate(this, R.layout.explode_layout, null)
+    }
+
+    fun upgradeBulletLevel(tag: Any): Int {
+        return when (tag) {
+            BULLET_LEVEL_1 -> {
+                BULLET_LEVEL_2
+            }
+            BULLET_LEVEL_2 -> {
+                BULLET_LEVEL_3
+            }
+            BULLET_LEVEL_3 -> {
+                BULLET_LEVEL_4
+            }
+            else -> {
+                BULLET_LEVEL_4
+            }
+        }
     }
 
 }
