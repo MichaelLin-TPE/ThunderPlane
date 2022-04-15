@@ -1,21 +1,15 @@
 package com.thunder.thunderplane
 
-import android.app.Activity
 import android.view.View
 import androidx.lifecycle.*
-import com.thunder.thunderplane.bean.BulletMoveData
+import com.thunder.thunderplane.bean.BulletData
 import com.thunder.thunderplane.bean.ControlData
 import com.thunder.thunderplane.bean.JetMoveData
 import com.thunder.thunderplane.bean.TargetMoveData
 import com.thunder.thunderplane.log.MichaelLog
 import com.thunder.thunderplane.tool.UITool
-import com.thunder.thunderplane.tool.UITool.getBulletView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(val repository: MainRepository) : ViewModel() {
 
     private val _moveJetLiveData = MutableLiveData<JetMoveData>()
     private val currentJetData get() = _moveJetLiveData.value!!
@@ -23,15 +17,9 @@ class MainViewModel : ViewModel() {
     private var jetX = 0f
     private var jetY = 0f
 
-    private val _bulletLiveData = MutableLiveData<View>()
-    private val currentBulletData get() = _bulletLiveData.value!!
-    val bulletLiveData: LiveData<View> = _bulletLiveData
-
-
-    private val _bulletMoveLiveData = MutableLiveData<BulletMoveData>()
-    private val currentBulletMoveData = _bulletMoveLiveData
-    val bulletMoveLiveData :LiveData<BulletMoveData> = _bulletMoveLiveData
-
+    private val _scoreLiveData = MutableLiveData<Long>(0)
+    private val currentScore get() =  _scoreLiveData.value!!
+    val scoreLiveData : LiveData<Long> = _scoreLiveData
 
     fun onMoveJefListener(
         rawX: Float,
@@ -59,7 +47,7 @@ class MainViewModel : ViewModel() {
         if (jetMoveY < 0) {
             return
         }
-        _moveJetLiveData.value = JetMoveData(jetMoveX, jetMoveY,right,left,top,bottom)
+        _moveJetLiveData.value = JetMoveData(jetMoveX, jetMoveY, right, left, top, bottom)
     }
 
     fun setJetXY(jetX: Float, jetY: Float) {
@@ -67,31 +55,18 @@ class MainViewModel : ViewModel() {
         this.jetY = jetY
     }
 
-    fun startShooting() {
-        viewModelScope.launch(Dispatchers.IO) {
-            while (isActive) {
-                _bulletLiveData.postValue((MyApplication.instance.applicationContext as Activity).getBulletView())
-
-                while (isActive) {
-
-                    currentBulletData.post {
-                        val centerX =
-                            (currentJetData.jetX + ((currentJetData.right - currentJetData.left) / 2)) - ((currentBulletData.right - currentBulletData.left) / 2)
-                        _bulletMoveLiveData.postValue(BulletMoveData(centerX,currentJetData.jetY - 100f))
-                    }
-
-                    delay(100)
-                }
-
-                delay(500)
-            }
-        }
+    fun addScore(score: Int) {
+        val num = currentScore + score
+        _scoreLiveData.value = num
     }
 
+    fun reStartScore() {
+        _scoreLiveData.value = 0
+    }
 
-    class MainViewModelFactory() : ViewModelProvider.Factory {
+    class MainViewModelFactory(private val mainRepository: MainRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return MainViewModel() as T
+            return MainViewModel(mainRepository) as T
         }
     }
 
