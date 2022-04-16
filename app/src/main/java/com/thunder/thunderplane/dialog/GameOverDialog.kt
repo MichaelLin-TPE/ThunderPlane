@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
 import android.view.Window
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
@@ -14,7 +15,7 @@ import com.thunder.thunderplane.R
 import com.thunder.thunderplane.tool.UITool
 import com.thunder.thunderplane.tool.UITool.getPixel
 
-class GameOverDialog : DialogFragment() {
+class GameOverDialog(private val score: Long) : DialogFragment() {
 
     private lateinit var fragmentActivity : FragmentActivity
 
@@ -31,7 +32,7 @@ class GameOverDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
+        isCancelable = false
         val inflater = fragmentActivity.layoutInflater
         val view = inflater.inflate(R.layout.game_over_dialog_layout, null)
         val dialog = Dialog(fragmentActivity)
@@ -43,7 +44,7 @@ class GameOverDialog : DialogFragment() {
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val wlp = window?.attributes
         wlp?.width = fragmentActivity.getPixel(350)
-        wlp?.height = fragmentActivity.getPixel(200)
+        wlp?.height = fragmentActivity.getPixel(300)
         window?.attributes = wlp
         return dialog
     }
@@ -51,7 +52,8 @@ class GameOverDialog : DialogFragment() {
     private fun initView(view: View) {
         val gameOver = view.findViewById<ConstraintLayout>(R.id.game_over_close)
         val restart = view.findViewById<ConstraintLayout>(R.id.game_over_restart)
-
+        val tvScore = view.findViewById<TextView>(R.id.game_over_score)
+        tvScore.text = getString(R.string.final_score) + score
         gameOver.setOnClickListener {
             onGameOverDialogClickListener.onCloseGame()
             dismiss()

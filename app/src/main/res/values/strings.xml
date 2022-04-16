@@ -2,6 +2,7 @@
     <string name="app_name">ThunderPlane</string>
     <string name="game_over">遊戲結束</string>
     <string name="restart">重新開始</string>
-    <string name="close">結束</string>
+    <string name="close">結束遊戲</string>
     <string name="up">UP</string>
+    <string name="final_score">"最終分數 : "</string>
 </resources>

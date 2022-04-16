@@ -8,6 +8,10 @@ import com.thunder.thunderplane.bean.JetMoveData
 import com.thunder.thunderplane.bean.TargetMoveData
 import com.thunder.thunderplane.log.MichaelLog
 import com.thunder.thunderplane.tool.UITool
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class MainViewModel(val repository: MainRepository) : ViewModel() {
 
@@ -20,6 +24,10 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
     private val _scoreLiveData = MutableLiveData<Long>(0)
     private val currentScore get() =  _scoreLiveData.value!!
     val scoreLiveData : LiveData<Long> = _scoreLiveData
+
+
+    private val _createSmallBossLiveData = MutableLiveData<Boolean>()
+    val createSmallBossLiveData : LiveData<Boolean> = _createSmallBossLiveData
 
     fun onMoveJefListener(
         rawX: Float,
@@ -62,6 +70,24 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
 
     fun reStartScore() {
         _scoreLiveData.value = 0
+    }
+
+    fun onCreateSmallBoss() {
+        viewModelScope.launch(Dispatchers.IO) {
+            while (isActive){
+                MichaelLog.i("score : $currentScore")
+                if (currentScore != 0L && currentScore % 2000 == 0L){
+                    viewModelScope.launch(Dispatchers.Main) {
+                        _createSmallBossLiveData.value = true
+                    }
+                    delay(2000)
+                    continue
+                }
+                delay(50)
+            }
+        }
+
+
     }
 
     class MainViewModelFactory(private val mainRepository: MainRepository) : ViewModelProvider.Factory {

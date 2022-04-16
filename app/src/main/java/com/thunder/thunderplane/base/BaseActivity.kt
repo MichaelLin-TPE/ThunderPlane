@@ -3,14 +3,19 @@ package com.thunder.thunderplane.base
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.thunder.thunderplane.dialog.GameOverDialog
+import com.thunder.thunderplane.tool.MusicTool
+import com.thunder.thunderplane.tool.MusicTool.initMusic
 
 open class BaseActivity : AppCompatActivity() {
 
-    fun showGameOverDialog(onGameOverDialogClickListener: GameOverDialog.OnGameOverDialogClickListener) {
+    fun showGameOverDialog(
+        score: Long,
+        onGameOverDialogClickListener: GameOverDialog.OnGameOverDialogClickListener
+    ) {
         if (isGameOverDialogShowing()) {
             return
         }
-        val dialog = GameOverDialog()
+        val dialog = GameOverDialog(score)
         dialog.show(supportFragmentManager, "dialog")
         dialog.setOnGameOverDialogClickListener(object :
             GameOverDialog.OnGameOverDialogClickListener {
@@ -31,6 +36,7 @@ open class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        this.initMusic()
+        MusicTool.playBgMusic()
     }
 }

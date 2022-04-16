@@ -4,6 +4,7 @@ import android.app.Activity
 import android.view.View
 import android.widget.ImageView
 import com.thunder.thunderplane.R
+import com.thunder.thunderplane.tool.ViewTool.getRandomUFOView
 
 object ViewTool {
 
@@ -29,8 +30,22 @@ object ViewTool {
         return view
     }
 
+    fun Activity.getSmallBoss(): View {
+        val list = mutableListOf<Int>()
+        list.add(R.drawable.ufo_boss)
+        list.add(R.drawable.ufo_boss1)
+        val view = View.inflate(this, R.layout.ufo_boss_layout, null)
+        val img = view.findViewById<ImageView>(R.id.boss)
+        img.setImageResource(list[(0 until list.size - 1).random()])
+        return view
+    }
+
     fun Activity.getUFoBullet(): View {
         return View.inflate(this, R.layout.ufo_bullet_layout, null)
+    }
+
+    fun Activity.getBossBullet(): View {
+        return View.inflate(this, R.layout.boss_bullet_layout, null)
     }
 
     fun Activity.getJetBullet(tag: Any): View {
