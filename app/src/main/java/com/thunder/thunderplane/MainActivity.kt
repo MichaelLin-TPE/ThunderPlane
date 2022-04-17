@@ -483,6 +483,11 @@ class MainActivity : BaseActivity() {
         }, 300)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        MusicTool.releaseAllMusic()
+    }
+
     /**
      * 檢查是否命中BOSS
      */

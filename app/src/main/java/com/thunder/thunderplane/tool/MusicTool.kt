@@ -44,4 +44,20 @@ object MusicTool {
         bgMusic?.pause()
     }
 
+    fun releaseAllMusic() {
+        shootMusic?.stop()
+        shootMusic?.release()
+        upgradeMusic?.stop()
+        upgradeMusic?.release()
+        gameOverMusic?.stop()
+        gameOverMusic?.release()
+        bgMusic?.stop()
+        bgMusic?.release()
+
+        shootMusic = null
+        upgradeMusic = null
+        gameOverMusic = null
+        bgMusic = null
+    }
+
 }
