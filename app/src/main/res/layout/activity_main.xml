@@ -4,7 +4,7 @@
     <data>
         <variable
             name="vm"
-            type="com.thunder.thunderplane.MainViewModel" />
+            type="com.thunder.thunderplane.PlayGroundViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -14,7 +14,7 @@
         android:background="@color/black"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        tools:context=".PlayGroundActivity">
         <com.thunder.thunderplane.wedgit.NotScrollNestedScrollView
             android:id="@+id/scroll_view"
             android:layout_width="match_parent"

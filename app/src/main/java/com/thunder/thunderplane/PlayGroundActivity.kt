@@ -1,11 +1,9 @@
 package com.thunder.thunderplane
 
 import android.annotation.SuppressLint
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.activity.viewModels
@@ -17,7 +15,7 @@ import com.thunder.thunderplane.databinding.ActivityMainBinding
 import com.thunder.thunderplane.dialog.GameOverDialog
 import com.thunder.thunderplane.log.MichaelLog
 import com.thunder.thunderplane.tool.MusicTool
-import com.thunder.thunderplane.tool.UITool
+import com.thunder.thunderplane.tool.Tool
 import com.thunder.thunderplane.tool.ViewTool
 import com.thunder.thunderplane.tool.ViewTool.BULLET_LEVEL_1
 import com.thunder.thunderplane.tool.ViewTool.getBossBullet
@@ -32,7 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MainActivity : BaseActivity() {
+class PlayGroundActivity : BaseActivity(){
 
     private lateinit var dataBinding: ActivityMainBinding
 
@@ -48,8 +46,8 @@ class MainActivity : BaseActivity() {
     private var isGameOver = false
     private var ufoBossData: UfoBossData? = null
 
-    private val viewModel: MainViewModel by viewModels {
-        MainViewModel.MainViewModelFactory(MainRepositoryImpl())
+    private val viewModel: PlayGroundViewModel by viewModels {
+        PlayGroundViewModel.MainViewModelFactory(PlayGroundRepositoryImpl())
     }
 
     /**
@@ -95,6 +93,8 @@ class MainActivity : BaseActivity() {
             createSmallBoss()
         }
 
+        MusicTool.playBgMusic()
+
     }
 
     private fun createSmallBoss() {
@@ -103,7 +103,7 @@ class MainActivity : BaseActivity() {
         view.visibility = View.INVISIBLE
         view.post {
             view.x =
-                (0..(UITool.getScreenWidth() - (view.right - view.left))).random().toFloat()
+                (0..(Tool.getScreenWidth() - (view.right - view.left))).random().toFloat()
             view.y = 100f
             view.tag = ufoIndex
             view.visibility = View.VISIBLE
@@ -125,7 +125,7 @@ class MainActivity : BaseActivity() {
                     handler.removeCallbacks(this)
                     return
                 }
-                val bullet = this@MainActivity.getBossBullet()
+                val bullet = this@PlayGroundActivity.getBossBullet()
                 dataBinding.root.addView(bullet)
                 bullet.visibility = View.INVISIBLE
                 bullet.post {
@@ -161,7 +161,7 @@ class MainActivity : BaseActivity() {
                 } else {
                     data?.boss?.x = data?.boss?.x!! - 10f
                 }
-                if ((data.boss.x + (data.boss.right - data.boss.left)) >= UITool.getScreenWidth()) {
+                if ((data.boss.x + (data.boss.right - data.boss.left)) >= Tool.getScreenWidth()) {
                     data.isRight = false
                 }
                 if (data.boss.x <= 0) {
@@ -184,7 +184,7 @@ class MainActivity : BaseActivity() {
                     } else {
                         data.boss.y = data.boss.y - 10f
                     }
-                    if ((data.boss.y + (data.boss.bottom - data.boss.top)) >= UITool.getScreenHeight() / 4) {
+                    if ((data.boss.y + (data.boss.bottom - data.boss.top)) >= Tool.getScreenHeight() / 4) {
                         data.isTop = true
                     }
                     if (data.boss.y <= 0) {
@@ -201,7 +201,7 @@ class MainActivity : BaseActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             val bgList = ArrayList<BgData>()
             for (i in 0..200) {
-                val view = RandomBgView(this@MainActivity)
+                val view = RandomBgView(this@PlayGroundActivity)
                 lifecycleScope.launch {
                     dataBinding.bgRoot.addView(view)
                 }
@@ -235,8 +235,8 @@ class MainActivity : BaseActivity() {
 
     private fun viewSetting(view: View) {
         val layoutParams = view.layoutParams
-        layoutParams.height = UITool.getScreenHeight()
-        layoutParams.width = UITool.getScreenWidth()
+        layoutParams.height = Tool.getScreenHeight()
+        layoutParams.width = Tool.getScreenWidth()
         view.layoutParams = layoutParams
     }
 
@@ -250,12 +250,12 @@ class MainActivity : BaseActivity() {
                     handler.removeCallbacks(this)
                     return
                 }
-                val ufo = this@MainActivity.getRandomUFOView()
+                val ufo = this@PlayGroundActivity.getRandomUFOView()
                 dataBinding.root.addView(ufo)
                 ufo.visibility = View.INVISIBLE
                 ufo.post {
                     ufo.x =
-                        (0..(UITool.getScreenWidth() - (ufo.right - ufo.left))).random().toFloat()
+                        (0..(Tool.getScreenWidth() - (ufo.right - ufo.left))).random().toFloat()
                     ufo.y = 100f
                     ufo.tag = ufoIndex
                     ufo.visibility = View.VISIBLE
@@ -300,7 +300,7 @@ class MainActivity : BaseActivity() {
                     handler.removeCallbacks(this)
                     return
                 }
-                val bullet = this@MainActivity.getUFoBullet()
+                val bullet = this@PlayGroundActivity.getUFoBullet()
                 dataBinding.root.addView(bullet)
                 bullet.visibility = View.INVISIBLE
                 bullet.post {
@@ -338,7 +338,7 @@ class MainActivity : BaseActivity() {
         handler.postDelayed(object : Runnable {
             override fun run() {
                 bullet.bulletView.y = bullet.bulletView.y + 10f
-                if (bullet.bulletView.y >= UITool.getScreenHeight()) {
+                if (bullet.bulletView.y >= Tool.getScreenHeight()) {
                     dataBinding.root.removeView(bullet.bulletView)
                     handler.removeCallbacks(this)
                     return
@@ -405,7 +405,7 @@ class MainActivity : BaseActivity() {
                 } else {
                     data.ufo.x = data.ufo.x - 10f
                 }
-                if ((data.ufo.x + (data.ufo.right - data.ufo.left)) >= UITool.getScreenWidth()) {
+                if ((data.ufo.x + (data.ufo.right - data.ufo.left)) >= Tool.getScreenWidth()) {
                     data.isRight = false
                 }
                 if (data.ufo.x <= 0) {
@@ -427,7 +427,7 @@ class MainActivity : BaseActivity() {
                 } else {
                     data.ufo.y = data.ufo.y - 10f
                 }
-                if ((data.ufo.y + (data.ufo.bottom - data.ufo.top)) >= UITool.getScreenHeight() / 4) {
+                if ((data.ufo.y + (data.ufo.bottom - data.ufo.top)) >= Tool.getScreenHeight() / 4) {
                     data.isTop = true
                 }
                 if (data.ufo.y <= 0) {
@@ -448,7 +448,7 @@ class MainActivity : BaseActivity() {
                     handler.removeCallbacks(this)
                     return
                 }
-                val view = this@MainActivity.getJetBullet(dataBinding.jet.tag)
+                val view = this@PlayGroundActivity.getJetBullet(dataBinding.jet.tag)
                 view.tag = bulletIndex
                 dataBinding.root.addView(view)
                 view.post {
@@ -536,7 +536,7 @@ class MainActivity : BaseActivity() {
      * 機率性產生升級
      */
     private fun createRandomUpgradeItem(x: Float, y: Float) {
-        if (!UITool.isCreateUpgradeItem()) {
+        if (!Tool.isCreateUpgradeItem()) {
             return
         }
         val view = this.getUpgradeItem()
@@ -587,7 +587,7 @@ class MainActivity : BaseActivity() {
                 } else {
                     data.updateItem.x = data.updateItem.x - 1f
                 }
-                if ((data.updateItem.x + (data.updateItem.right - data.updateItem.left)) >= UITool.getScreenWidth()) {
+                if ((data.updateItem.x + (data.updateItem.right - data.updateItem.left)) >= Tool.getScreenWidth()) {
                     data.isRight = false
                 }
                 if (data.updateItem.x <= 0) {
@@ -609,7 +609,7 @@ class MainActivity : BaseActivity() {
                 } else {
                     data.updateItem.y = data.updateItem.y - 10f
                 }
-                if ((data.updateItem.y + (data.updateItem.bottom - data.updateItem.top)) >= UITool.getScreenHeight()) {
+                if ((data.updateItem.y + (data.updateItem.bottom - data.updateItem.top)) >= Tool.getScreenHeight()) {
                     data.isTop = true
                 }
                 if (data.updateItem.y <= 0) {

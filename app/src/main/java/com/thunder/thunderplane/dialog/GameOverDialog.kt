@@ -12,8 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import com.thunder.thunderplane.R
-import com.thunder.thunderplane.tool.UITool
-import com.thunder.thunderplane.tool.UITool.getPixel
+import com.thunder.thunderplane.tool.Tool.getPixel
 
 class GameOverDialog(private val score: Long) : DialogFragment() {
 

@@ -17,6 +17,7 @@ open class BaseActivity : AppCompatActivity() {
         }
         val dialog = GameOverDialog(score)
         dialog.show(supportFragmentManager, "dialog")
+
         dialog.setOnGameOverDialogClickListener(object :
             GameOverDialog.OnGameOverDialogClickListener {
             override fun onCloseGame() {
@@ -37,6 +38,5 @@ open class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.initMusic()
-        MusicTool.playBgMusic()
     }
 }

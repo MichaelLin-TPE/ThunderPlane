@@ -51,6 +51,7 @@ object MusicTool {
     fun playLaunchMusic(){
         launchMusic?.start()
     }
+
     fun stopLaunchMusic(){
         launchMusic?.seekTo(0)
         launchMusic?.pause()

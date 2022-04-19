@@ -1,13 +1,22 @@
 package com.thunder.thunderplane.tool
 
+import android.animation.ValueAnimator
+import android.app.ActionBar
 import android.content.Context
+import android.util.Log
 import android.util.TypedValue
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.Transformation
 import com.thunder.thunderplane.MyApplication
 import com.thunder.thunderplane.R
 import com.thunder.thunderplane.log.MichaelLog
+import java.time.Duration
 import kotlin.math.roundToInt
 
-object UITool {
+object Tool {
 
     fun getScreenHeight(): Int =
         MyApplication.instance.applicationContext.resources.displayMetrics.heightPixels
@@ -59,6 +68,19 @@ object UITool {
         }
         MichaelLog.i("list size : ${list.size}")
         return list
+    }
+
+    fun expend(view : View,duration: Long , targetHeight : Int){
+        val prevHeight = view.height
+        view.visibility = View.VISIBLE
+        val valueAnimator = ValueAnimator.ofInt(prevHeight,targetHeight)
+        valueAnimator.addUpdateListener {
+            view.layoutParams.height = it.animatedValue as Int
+            view.requestLayout()
+        }
+        valueAnimator.interpolator = DecelerateInterpolator()
+        valueAnimator.duration = duration
+        valueAnimator.start()
     }
 
 }

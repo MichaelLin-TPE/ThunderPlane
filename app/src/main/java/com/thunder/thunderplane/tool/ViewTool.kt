@@ -8,10 +8,10 @@ import com.thunder.thunderplane.tool.ViewTool.getRandomUFOView
 
 object ViewTool {
 
-    val BULLET_LEVEL_1 = 111
-    val BULLET_LEVEL_2 = 222
-    val BULLET_LEVEL_3 = 333
-    val BULLET_LEVEL_4 = 4444
+    const val BULLET_LEVEL_1 = 111
+    const val BULLET_LEVEL_2 = 222
+    const val BULLET_LEVEL_3 = 333
+    const val BULLET_LEVEL_4 = 4444
 
     fun Activity.getUpgradeItem(): View {
         return View.inflate(this, R.layout.upgrade_item_layout, null)

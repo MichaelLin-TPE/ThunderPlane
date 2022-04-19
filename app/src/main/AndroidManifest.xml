@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".PlayGroundActivity"
             android:exported="true">
         </activity>
     </application>

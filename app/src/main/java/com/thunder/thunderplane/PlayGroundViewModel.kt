@@ -1,19 +1,15 @@
 package com.thunder.thunderplane
 
-import android.view.View
 import androidx.lifecycle.*
-import com.thunder.thunderplane.bean.BulletData
-import com.thunder.thunderplane.bean.ControlData
 import com.thunder.thunderplane.bean.JetMoveData
-import com.thunder.thunderplane.bean.TargetMoveData
 import com.thunder.thunderplane.log.MichaelLog
-import com.thunder.thunderplane.tool.UITool
+import com.thunder.thunderplane.tool.Tool
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-class MainViewModel(val repository: MainRepository) : ViewModel() {
+class PlayGroundViewModel(val repository: PlayGroundRepository) : ViewModel() {
 
     private val _moveJetLiveData = MutableLiveData<JetMoveData>()
     private val currentJetData get() = _moveJetLiveData.value!!
@@ -42,13 +38,13 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
         val jetMoveX = rawX + jetX
         val jetMoveY = rawY + jetY
 
-        if ((jetMoveX + jetWidth) > UITool.getScreenWidth()) {
+        if ((jetMoveX + jetWidth) > Tool.getScreenWidth()) {
             return
         }
         if (jetMoveX < 0) {
             return
         }
-        if ((jetMoveY + jetHeight) > UITool.getScreenHeight()) {
+        if ((jetMoveY + jetHeight) > Tool.getScreenHeight()) {
             return
         }
 
@@ -90,9 +86,9 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
 
     }
 
-    class MainViewModelFactory(private val mainRepository: MainRepository) : ViewModelProvider.Factory {
+    class MainViewModelFactory(private val playGroundRepository: PlayGroundRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return MainViewModel(mainRepository) as T
+            return PlayGroundViewModel(playGroundRepository) as T
         }
     }
 

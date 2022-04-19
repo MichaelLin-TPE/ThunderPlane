@@ -2,10 +2,8 @@ package com.thunder.thunderplane.wedgit
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.thunder.thunderplane.R
-import com.thunder.thunderplane.tool.UITool.getRandomBackground
+import com.thunder.thunderplane.tool.Tool.getRandomBackground
 
 class RandomBgView : ConstraintLayout {
 
