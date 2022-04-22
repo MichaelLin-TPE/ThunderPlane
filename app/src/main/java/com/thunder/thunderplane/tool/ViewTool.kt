@@ -4,6 +4,7 @@ import android.app.Activity
 import android.view.View
 import android.widget.ImageView
 import com.thunder.thunderplane.R
+import com.thunder.thunderplane.tool.ViewTool.getJetBullet
 import com.thunder.thunderplane.tool.ViewTool.getRandomUFOView
 
 object ViewTool {
@@ -82,6 +83,23 @@ object ViewTool {
             }
             else -> {
                 BULLET_LEVEL_4
+            }
+        }
+    }
+
+    fun getDamage(tag: Any): Int {
+        return when (tag) {
+            BULLET_LEVEL_1 -> {
+                10
+            }
+            BULLET_LEVEL_2 -> {
+                20
+            }
+            BULLET_LEVEL_3 -> {
+                30
+            }
+            else -> {
+                10
             }
         }
     }

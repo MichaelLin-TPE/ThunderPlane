@@ -6,6 +6,8 @@ import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
@@ -43,8 +45,9 @@ class PlayGroundActivity : BaseActivity(){
     private val ufoBulletList = ArrayList<UfoBulletData>()
     private var bulletIndex = 0
     private var ufoIndex = 0
+    private var bossIndex = 0
     private var isGameOver = false
-    private var ufoBossData: UfoBossData? = null
+    private val ufoBossList = ArrayList<UfoBossData>()
 
     private val viewModel: PlayGroundViewModel by viewModels {
         PlayGroundViewModel.MainViewModelFactory(PlayGroundRepositoryImpl())
@@ -105,10 +108,12 @@ class PlayGroundActivity : BaseActivity(){
             view.x =
                 (0..(Tool.getScreenWidth() - (view.right - view.left))).random().toFloat()
             view.y = 100f
-            view.tag = ufoIndex
+            view.tag = bossIndex
+            bossIndex ++
             view.visibility = View.VISIBLE
             MichaelLog.i("生成BOSS")
-            ufoBossData = UfoBossData(view,isRight = true,isTop = false)
+            val ufoBossData = UfoBossData(view,isRight = true,isTop = false)
+            ufoBossList.add(ufoBossData)
             moveBoss(ufoBossData)
             bossShootUser(view)
         }
@@ -121,7 +126,7 @@ class PlayGroundActivity : BaseActivity(){
                     handler.removeCallbacks(this)
                     return
                 }
-                if (isUFOBossDestroy()) {
+                if (isUFOBossDestroy(view.tag)) {
                     handler.removeCallbacks(this)
                     return
                 }
@@ -139,27 +144,37 @@ class PlayGroundActivity : BaseActivity(){
                     moveUFOBullet(data)
                 }
                 handler.removeCallbacks(this)
-                handler.postDelayed(this, 1000)
+                handler.postDelayed(this, 500)
             }
 
-        }, 1000)
+        }, 500)
     }
 
-    private fun isUFOBossDestroy(): Boolean {
-        return ufoBossData == null
+    private fun isUFOBossDestroy(tag: Any): Boolean {
+        if (ufoBossList.isEmpty()){
+            return true
+        }
+        var isDestroy = false
+        ufoBossList.forEach {
+            if (tag == it.boss.tag){
+                isDestroy = false
+            }
+        }
+        return isDestroy
     }
 
-    private fun moveBoss(data : UfoBossData?) {
+    private fun moveBoss(data : UfoBossData) {
         handler.postDelayed(object : Runnable {
             override fun run() {
                 if (isGameOver) {
+                    dataBinding.root.removeView(data.boss)
                     handler.removeCallbacks(this)
                     return
                 }
-                if (data?.isRight == true) {
-                    data.boss.x = data.boss.x + 10f
+                if (data.isRight == true) {
+                    data.boss.x = data.boss.x + 1f
                 } else {
-                    data?.boss?.x = data?.boss?.x!! - 10f
+                    data.boss.x = data.boss.x - 1f
                 }
                 if ((data.boss.x + (data.boss.right - data.boss.left)) >= Tool.getScreenWidth()) {
                     data.isRight = false
@@ -266,9 +281,9 @@ class PlayGroundActivity : BaseActivity(){
                 }
                 ufoIndex++
                 handler.removeCallbacks(this)
-                handler.postDelayed(this, 500)
+                handler.postDelayed(this, 2000)
             }
-        }, 500)
+        }, 2000)
 
     }
 
@@ -314,10 +329,10 @@ class PlayGroundActivity : BaseActivity(){
                     moveUFOBullet(data)
                 }
                 handler.removeCallbacks(this)
-                handler.postDelayed(this, 1000)
+                handler.postDelayed(this, 500)
             }
 
-        }, 1000)
+        }, 500)
 
 
     }
@@ -369,6 +384,7 @@ class PlayGroundActivity : BaseActivity(){
 
                 override fun onRestartGame() {
                     clearAllBullet()
+                    ufoBossList.clear()
                     isGameOver = false
                     MusicTool.playBgMusic()
                     viewModel.reStartScore()
@@ -492,20 +508,33 @@ class PlayGroundActivity : BaseActivity(){
      * 檢查是否命中BOSS
      */
     private fun checkBulletHitBoss(view: View) {
-        if (ufoBossData == null){
+        if (ufoBossList.isEmpty()){
             return
         }
-        if (view.y >= ufoBossData!!.boss.y &&
-            view.y <= (ufoBossData!!.boss.y + (ufoBossData!!.boss.bottom - ufoBossData!!.boss.top)) &&
-            view.x >= ufoBossData!!.boss.x &&
-            view.x <= (ufoBossData!!.boss.x + (ufoBossData!!.boss.right - ufoBossData!!.boss.left))
-        ) {
-            createRandomUpgradeItem(view.x, view.y)
-            createExplodeView(view.x, view.y)
-            dataBinding.root.removeView(ufoBossData!!.boss)
-            deleteBullet(view)
-            ufoBossData = null
-            viewModel.addScore(500)
+        val iterator = ufoBossList.iterator()
+        while (iterator.hasNext()){
+            val ufoBossData = iterator.next()
+            if (view.y >= ufoBossData.boss.y &&
+                view.y <= (ufoBossData.boss.y + (ufoBossData.boss.bottom - ufoBossData.boss.top)) &&
+                view.x >= ufoBossData.boss.x &&
+                view.x <= (ufoBossData.boss.x + (ufoBossData.boss.right - ufoBossData.boss.left))
+            ) {
+                if (ufoBossData.hp > 0){
+                    MichaelLog.i("boss hp : ${ufoBossData.hp}")
+                    ufoBossData.hp = ufoBossData.hp - ViewTool.getDamage(dataBinding.jet.tag)
+                    val alphaAnimation = AlphaAnimation(1.0f, 0.2f)
+                    alphaAnimation.duration = 100
+                    alphaAnimation.fillAfter = false
+                    ufoBossData.boss.startAnimation(alphaAnimation)
+                    continue
+                }
+                createRandomUpgradeItem(view.x, view.y)
+                createExplodeView(view.x, view.y)
+                dataBinding.root.removeView(ufoBossData.boss)
+                deleteBullet(view)
+                iterator.remove()
+                viewModel.addScore(500)
+            }
         }
     }
 

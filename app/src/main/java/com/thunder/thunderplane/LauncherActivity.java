@@ -1,11 +1,13 @@
 package com.thunder.thunderplane;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -19,8 +21,6 @@ public class LauncherActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
-
-        MusicTool.INSTANCE.playLaunchMusic();
 
         //透明度動畫
         ImageView ivPress = findViewById(R.id.iv_press);
@@ -38,17 +38,55 @@ public class LauncherActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 Log.i("Michael","點擊背景");
-//                ivPress.clearAnimation();
-//                ivPress.setVisibility(View.GONE);
+                ivPress.clearAnimation();
+                ivPress.setVisibility(View.GONE);
                 Tool.INSTANCE.expend(menuView,1000,Tool.INSTANCE.getPixel(LauncherActivity.this,200));
+            }
+        });
+
+        TextView tvPlayGame = findViewById(R.id.play_game);
+        TextView tvSetting = findViewById(R.id.setting);
+        TextView tvCloseGame = findViewById(R.id.close);
+
+        tvPlayGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LauncherActivity.this,PlayGroundActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        tvSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        tvCloseGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
 
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        MusicTool.INSTANCE.playLaunchMusic();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicTool.INSTANCE.releaseAllMusic();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
-        MusicTool.INSTANCE.releaseAllMusic();
+        MusicTool.INSTANCE.stopLaunchMusic();
     }
 }

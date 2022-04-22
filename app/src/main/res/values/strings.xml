@@ -6,4 +6,7 @@
     <string name="up">UP</string>
     <string name="final_score">"最終分數 : "</string>
     <string name="press_anywhere">點擊任意處開始</string>
+    <string name="play_game">開始遊戲</string>
+    <string name="setting">設定</string>
+    <string name="close_game">結束遊戲</string>
 </resources>
