@@ -32,7 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class PlayGroundActivity : BaseActivity(){
+class PlayGroundActivity : BaseActivity() {
 
     private lateinit var dataBinding: ActivityMainBinding
 
@@ -109,10 +109,10 @@ class PlayGroundActivity : BaseActivity(){
                 (0..(Tool.getScreenWidth() - (view.right - view.left))).random().toFloat()
             view.y = 100f
             view.tag = bossIndex
-            bossIndex ++
+            bossIndex++
             view.visibility = View.VISIBLE
             MichaelLog.i("生成BOSS")
-            val ufoBossData = UfoBossData(view,isRight = true,isTop = false)
+            val ufoBossData = UfoBossData(view, isRight = true, isTop = false)
             ufoBossList.add(ufoBossData)
             moveBoss(ufoBossData)
             bossShootUser(view)
@@ -151,19 +151,19 @@ class PlayGroundActivity : BaseActivity(){
     }
 
     private fun isUFOBossDestroy(tag: Any): Boolean {
-        if (ufoBossList.isEmpty()){
+        if (ufoBossList.isEmpty()) {
             return true
         }
         var isDestroy = false
         ufoBossList.forEach {
-            if (tag == it.boss.tag){
+            if (tag == it.boss.tag) {
                 isDestroy = false
             }
         }
         return isDestroy
     }
 
-    private fun moveBoss(data : UfoBossData) {
+    private fun moveBoss(data: UfoBossData) {
         handler.postDelayed(object : Runnable {
             override fun run() {
                 if (isGameOver) {
@@ -171,10 +171,10 @@ class PlayGroundActivity : BaseActivity(){
                     handler.removeCallbacks(this)
                     return
                 }
-                if (data.isRight == true) {
-                    data.boss.x = data.boss.x + 1f
+                if (data.isRight) {
+                    data.boss.x = data.boss.x + 5f
                 } else {
-                    data.boss.x = data.boss.x - 1f
+                    data.boss.x = data.boss.x - 5f
                 }
                 if ((data.boss.x + (data.boss.right - data.boss.left)) >= Tool.getScreenWidth()) {
                     data.isRight = false
@@ -193,19 +193,19 @@ class PlayGroundActivity : BaseActivity(){
                     handler.removeCallbacks(this)
                     return
                 }
-                if (data != null){
-                    if (!data.isTop) {
-                        data.boss.y = data.boss.y + 10f
-                    } else {
-                        data.boss.y = data.boss.y - 10f
-                    }
-                    if ((data.boss.y + (data.boss.bottom - data.boss.top)) >= Tool.getScreenHeight() / 4) {
-                        data.isTop = true
-                    }
-                    if (data.boss.y <= 0) {
-                        data.isTop = false
-                    }
+
+                if (!data.isTop) {
+                    data.boss.y = data.boss.y + 10f
+                } else {
+                    data.boss.y = data.boss.y - 10f
                 }
+                if ((data.boss.y + (data.boss.bottom - data.boss.top)) >= Tool.getScreenHeight() / 4) {
+                    data.isTop = true
+                }
+                if (data.boss.y <= 0) {
+                    data.isTop = false
+                }
+
                 handler.postDelayed(this, 1)
             }
         }, 1)
@@ -508,18 +508,18 @@ class PlayGroundActivity : BaseActivity(){
      * 檢查是否命中BOSS
      */
     private fun checkBulletHitBoss(view: View) {
-        if (ufoBossList.isEmpty()){
+        if (ufoBossList.isEmpty()) {
             return
         }
         val iterator = ufoBossList.iterator()
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             val ufoBossData = iterator.next()
             if (view.y >= ufoBossData.boss.y &&
                 view.y <= (ufoBossData.boss.y + (ufoBossData.boss.bottom - ufoBossData.boss.top)) &&
                 view.x >= ufoBossData.boss.x &&
                 view.x <= (ufoBossData.boss.x + (ufoBossData.boss.right - ufoBossData.boss.left))
             ) {
-                if (ufoBossData.hp > 0){
+                if (ufoBossData.hp > 0) {
                     MichaelLog.i("boss hp : ${ufoBossData.hp}")
                     ufoBossData.hp = ufoBossData.hp - ViewTool.getDamage(dataBinding.jet.tag)
                     val alphaAnimation = AlphaAnimation(1.0f, 0.2f)
