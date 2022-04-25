@@ -7,7 +7,6 @@ import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AlphaAnimation
-import android.view.animation.Animation
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
@@ -18,8 +17,10 @@ import com.thunder.thunderplane.dialog.GameOverDialog
 import com.thunder.thunderplane.log.MichaelLog
 import com.thunder.thunderplane.tool.MusicTool
 import com.thunder.thunderplane.tool.Tool
+import com.thunder.thunderplane.tool.Tool.getScreenWidth
 import com.thunder.thunderplane.tool.ViewTool
 import com.thunder.thunderplane.tool.ViewTool.BULLET_LEVEL_1
+import com.thunder.thunderplane.tool.ViewTool.BULLET_LEVEL_5
 import com.thunder.thunderplane.tool.ViewTool.getBossBullet
 import com.thunder.thunderplane.tool.ViewTool.getExplodeView
 import com.thunder.thunderplane.tool.ViewTool.getJetBullet
@@ -464,6 +465,11 @@ class PlayGroundActivity : BaseActivity() {
                     handler.removeCallbacks(this)
                     return
                 }
+                if (dataBinding.jet.tag == BULLET_LEVEL_5) {
+                    createPowerfulBullet(this)
+                    return
+                }
+
                 val view = this@PlayGroundActivity.getJetBullet(dataBinding.jet.tag)
                 view.tag = bulletIndex
                 dataBinding.root.addView(view)
@@ -476,7 +482,7 @@ class PlayGroundActivity : BaseActivity() {
                     bulletList.add(BulletData(view, view.x, view.y, bulletIndex))
                     handler.postDelayed(object : Runnable {
                         override fun run() {
-                            view.y = view.y - 100f
+                            view.y = view.y - 15f
                             if (view.y + (view.bottom - view.top) < 0) {
                                 deleteBullet(view)
                                 handler.removeCallbacks(this)
@@ -486,17 +492,103 @@ class PlayGroundActivity : BaseActivity() {
                             updateBulletData(view)
                             checkBulletHitUFO(view)
                             checkBulletHitBoss(view)
-                            handler.postDelayed(this, 50)
+                            handler.postDelayed(this, 1)
                         }
-                    }, 50)
+                    }, 1)
                     handler.removeCallbacks(this)
-                    handler.postDelayed(this, 300)
+                    handler.postDelayed(this, 500)
                 }
                 playGunSound()
 
                 bulletIndex++
             }
-        }, 300)
+        }, 500)
+    }
+
+    private fun movePowerfulBulletY(view: View) {
+        handler.postDelayed(object : Runnable {
+            override fun run() {
+                view.y = view.y - 15f
+                if (view.y <= 0) {
+                    dataBinding.root.removeView(view)
+                    handler.removeCallbacks(this)
+                    return
+                }
+                handler.postDelayed(this, 1)
+            }
+        }, 1)
+    }
+
+
+    private fun createPowerfulBullet(param: Runnable) {
+        for (i in 0 until 5) {
+
+            val view =
+                View.inflate(this@PlayGroundActivity, R.layout.bullet_layout, null)
+            view.tag = bulletIndex
+            dataBinding.root.addView(view)
+            view.visibility = View.INVISIBLE
+            view.post {
+
+                val centerX =
+                    (dataBinding.jet.x + ((dataBinding.jet.right - dataBinding.jet.left) / 2)) - ((view.right - view.left) / 2)
+                view.x = centerX
+                view.y = dataBinding.jet.y
+                view.visibility = View.VISIBLE
+                bulletList.add(BulletData(view, view.x, view.y, bulletIndex))
+                movePowerfulBulletY(view)
+                when (i) {
+                    0 -> {
+                        movePowerfulBulletX(view,false,15)
+                    }
+                    1 -> {
+                        movePowerfulBulletX(view,false,35)
+                    }
+                    2 -> {
+
+                    }
+                    3 -> {
+                        movePowerfulBulletX(view,true,35)
+                    }
+                    else -> {
+                        movePowerfulBulletX(view,true,15)
+                    }
+                }
+            }
+            bulletIndex++
+        }
+        playGunSound()
+        handler.postDelayed(param,500)
+    }
+
+    private fun movePowerfulBulletX(view: View, isPlus: Boolean, speed: Int) {
+        handler.postDelayed(object : Runnable {
+            override fun run() {
+                if (isPlus) {
+                    view.x = view.x + 8.0.toFloat()
+                    if (view.x >= getScreenWidth()) {
+                        dataBinding.root.removeView(view)
+                        handler.removeCallbacks(this)
+                        return
+                    }
+                    updateBulletData(view)
+                    checkBulletHitUFO(view)
+                    checkBulletHitBoss(view)
+                    handler.postDelayed(this, speed.toLong())
+                    return
+                }
+                view.x = view.x - 8.0.toFloat()
+                if (view.x <= 0) {
+                    dataBinding.root.removeView(view)
+                    handler.removeCallbacks(this)
+                    return
+                }
+                updateBulletData(view)
+                checkBulletHitUFO(view)
+                checkBulletHitBoss(view)
+                handler.postDelayed(this, speed.toLong())
+            }
+        }, speed.toLong())
     }
 
     override fun onDestroy() {

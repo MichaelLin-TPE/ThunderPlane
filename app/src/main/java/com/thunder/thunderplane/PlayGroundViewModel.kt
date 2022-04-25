@@ -71,7 +71,7 @@ class PlayGroundViewModel(val repository: PlayGroundRepository) : ViewModel() {
     fun onCreateSmallBoss() {
         viewModelScope.launch(Dispatchers.IO) {
             while (isActive){
-                if (currentScore != 0L && currentScore % 2000 == 0L){
+                if (currentScore != 0L && currentScore % 500 == 0L){
                     viewModelScope.launch(Dispatchers.Main) {
                         _createSmallBossLiveData.value = true
                         _scoreLiveData.value = currentScore + 100
