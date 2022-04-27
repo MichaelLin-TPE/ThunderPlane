@@ -41,6 +41,15 @@ object ViewTool {
         img.setImageResource(list[(0 until list.size).random()])
         return view
     }
+    fun Activity.getBigBoss(): View {
+        val list = mutableListOf<Int>()
+        list.add(R.drawable.big_boss1)
+        val view = View.inflate(this, R.layout.ufo_big_boss_layout, null)
+        val img = view.findViewById<ImageView>(R.id.boss)
+        img.setImageResource(list[(0 until list.size).random()])
+        return view
+    }
+
 
     fun Activity.getUFoBullet(): View {
         return View.inflate(this, R.layout.ufo_bullet_layout, null)
@@ -94,16 +103,19 @@ object ViewTool {
     fun getDamage(tag: Any): Int {
         return when (tag) {
             BULLET_LEVEL_1 -> {
-                10
-            }
-            BULLET_LEVEL_2 -> {
                 20
             }
-            BULLET_LEVEL_3 -> {
+            BULLET_LEVEL_2 -> {
                 30
             }
+            BULLET_LEVEL_3 -> {
+                40
+            }
+            BULLET_LEVEL_4 ->{
+                50
+            }
             else -> {
-                10
+               30
             }
         }
     }

@@ -28,9 +28,8 @@
         android:layout_marginEnd="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         android:background="@drawable/launch_menu_bg_shape"
-        android:visibility="gone"
         android:layout_width="0dp"
-        android:layout_height="200dp">
+        android:layout_height="1dp">
 
 
         <TextView

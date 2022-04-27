@@ -25,6 +25,10 @@ class PlayGroundViewModel(val repository: PlayGroundRepository) : ViewModel() {
     private val _createSmallBossLiveData = MutableLiveData<Boolean>()
     val createSmallBossLiveData : LiveData<Boolean> = _createSmallBossLiveData
 
+    private val _createBigBossLiveData = MutableLiveData<Boolean>()
+    val createBigBossLiveData : LiveData<Boolean> = _createBigBossLiveData
+
+
     fun onMoveJefListener(
         rawX: Float,
         rawY: Float,
@@ -71,6 +75,13 @@ class PlayGroundViewModel(val repository: PlayGroundRepository) : ViewModel() {
     fun onCreateSmallBoss() {
         viewModelScope.launch(Dispatchers.IO) {
             while (isActive){
+                if (currentScore != 0L && currentScore >= 1000){
+                    MichaelLog.i("顯示大BOSS")
+                    viewModelScope.launch(Dispatchers.Main) {
+                        _createBigBossLiveData.value = true
+                    }
+                    break
+                }
                 if (currentScore != 0L && currentScore % 500 == 0L){
                     viewModelScope.launch(Dispatchers.Main) {
                         _createSmallBossLiveData.value = true
@@ -84,6 +95,11 @@ class PlayGroundViewModel(val repository: PlayGroundRepository) : ViewModel() {
         }
 
 
+    }
+
+    fun onPause() {
+        _createSmallBossLiveData.value = false
+        _createBigBossLiveData.value = false
     }
 
     class MainViewModelFactory(private val playGroundRepository: PlayGroundRepository) : ViewModelProvider.Factory {

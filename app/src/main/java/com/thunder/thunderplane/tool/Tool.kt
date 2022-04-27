@@ -72,7 +72,7 @@ object Tool {
 
     fun expend(view : View,duration: Long , targetHeight : Int){
         val prevHeight = view.height
-        view.visibility = View.VISIBLE
+
         val valueAnimator = ValueAnimator.ofInt(prevHeight,targetHeight)
         valueAnimator.addUpdateListener {
             view.layoutParams.height = it.animatedValue as Int
@@ -81,6 +81,7 @@ object Tool {
         valueAnimator.interpolator = DecelerateInterpolator()
         valueAnimator.duration = duration
         valueAnimator.start()
+        view.visibility = View.VISIBLE
     }
 
 }
