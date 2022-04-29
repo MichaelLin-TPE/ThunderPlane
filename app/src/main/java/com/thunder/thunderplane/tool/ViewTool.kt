@@ -1,6 +1,7 @@
 package com.thunder.thunderplane.tool
 
 import android.app.Activity
+import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import com.thunder.thunderplane.R
@@ -19,7 +20,7 @@ object ViewTool {
         return View.inflate(this, R.layout.upgrade_item_layout, null)
     }
 
-    fun Activity.getRandomUFOView(): View {
+    fun Context.getRandomUFOView(): View {
         val viewList = mutableListOf<Int>()
         viewList.add(R.drawable.ufo)
         viewList.add(R.drawable.ufo1)
@@ -51,7 +52,7 @@ object ViewTool {
     }
 
 
-    fun Activity.getUFoBullet(): View {
+    fun Context.getUFoBullet(): View {
         return View.inflate(this, R.layout.ufo_bullet_layout, null)
     }
 

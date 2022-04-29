@@ -35,6 +35,10 @@ import com.thunder.thunderplane.wedgit.RandomBgView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.java.KoinJavaComponent.inject
+import org.koin.java.KoinJavaComponent.injectOrNull
+
 
 class PlayGroundActivity : BaseActivity() {
 
@@ -45,17 +49,14 @@ class PlayGroundActivity : BaseActivity() {
     private val handler = Handler(Looper.myLooper()!!)
     private val bulletList = ArrayList<BulletData>()
     private val bossBulletList = ArrayList<BulletData>()
-    private val ufoList = ArrayList<UFOData>()
     private val upgradeItemList = ArrayList<UpgradeItemData>()
-    private val ufoBulletList = ArrayList<UfoBulletData>()
     private var bulletIndex = 0
     private var bossBulletIndex = 0
-    private var ufoIndex = 0
     private var bossIndex = 0
     private var isGameOver = false
     private val ufoBossList = ArrayList<UfoBossData>()
-    private var bigBossData : UfoBigBossData? = null
-
+    private var bigBossData: UfoBigBossData? = null
+    private val ufoHandler by inject<UFOHandler>()
     private val viewModel: PlayGroundViewModel by viewModels {
         PlayGroundViewModel.MainViewModelFactory(PlayGroundRepositoryImpl())
     }
@@ -73,8 +74,15 @@ class PlayGroundActivity : BaseActivity() {
         dataBinding.jet.tag = BULLET_LEVEL_1
         initView()
 
+
         //產生UFO
-        appearUFO()
+
+        ufoHandler.appearUfo(dataBinding.root)
+        ufoHandler.setOnShowGameOverListener{
+            showGameOver()
+
+        }
+
         //產生子彈
         startShooting()
 
@@ -102,9 +110,9 @@ class PlayGroundActivity : BaseActivity() {
             createSmallBoss()
         }
 
-        viewModel.createBigBossLiveData.observe(this){
+        viewModel.createBigBossLiveData.observe(this) {
             MichaelLog.i("isShowBoss : $it")
-            if (!it){
+            if (!it) {
                 return@observe
             }
             MichaelLog.i("isShowBoss $it")
@@ -113,6 +121,28 @@ class PlayGroundActivity : BaseActivity() {
 
         MusicTool.playBgMusic()
 
+    }
+
+    private fun showGameOver() {
+        showGameOverDialog(viewModel.scoreLiveData.value!!,
+            object : GameOverDialog.OnGameOverDialogClickListener {
+                override fun onCloseGame() {
+                    finish()
+
+                }
+
+                override fun onRestartGame() {
+                    clearAllBullet()
+                    clearAllBossBullet()
+                    ufoBossList.clear()
+                    isGameOver = false
+                    MusicTool.playBgMusic()
+                    viewModel.reStartScore()
+                    initView()
+                    ufoHandler.appearUfo(dataBinding.root)
+                    startShooting()
+                }
+            })
     }
 
     private fun createBigBoss() {
@@ -132,10 +162,10 @@ class PlayGroundActivity : BaseActivity() {
 
     private fun startToShootUser(bigBossData: UfoBigBossData) {
 
-        handler.postDelayed(object : Runnable{
+        handler.postDelayed(object : Runnable {
             override fun run() {
 
-                if (isGameOver){
+                if (isGameOver) {
                     handler.removeCallbacks(this)
                     return
                 }
@@ -149,57 +179,59 @@ class PlayGroundActivity : BaseActivity() {
                     view.visibility = View.INVISIBLE
                     view.post {
                         val xList = mutableListOf<Float>()
-                        for (times in 1..5){
-                            val x = (((bigBossData.boss.right - bigBossData.boss.left) / 4) * times).toFloat()
+                        for (times in 1..5) {
+                            val x =
+                                (((bigBossData.boss.right - bigBossData.boss.left) / 4) * times).toFloat()
                             xList.add(x)
                         }
                         val centerX = xList[(0 until xList.size).random()]
                         view.x = centerX
-                        view.y = bigBossData.boss.y + (bigBossData.boss.bottom - bigBossData.boss.top)
+                        view.y =
+                            bigBossData.boss.y + (bigBossData.boss.bottom - bigBossData.boss.top)
                         view.visibility = View.VISIBLE
                         bossBulletList.add(BulletData(view, view.x, view.y, bossBulletIndex))
                         moveBossPowerfulBulletY(view)
                         when (i) {
                             0 -> {
-                                moveBossPowerfulBulletX(view,false,15)
+                                moveBossPowerfulBulletX(view, false, 15)
                             }
                             1 -> {
-                                moveBossPowerfulBulletX(view,false,35)
+                                moveBossPowerfulBulletX(view, false, 35)
                             }
                             2 -> {
 
                             }
                             3 -> {
-                                moveBossPowerfulBulletX(view,true,35)
+                                moveBossPowerfulBulletX(view, true, 35)
                             }
                             else -> {
-                                moveBossPowerfulBulletX(view,true,15)
+                                moveBossPowerfulBulletX(view, true, 15)
                             }
                         }
                     }
                     bossBulletIndex++
                 }
 
-                handler.postDelayed(this,3000)
+                handler.postDelayed(this, 3000)
             }
-        },3000);
+        }, 3000);
 
 
     }
 
     private fun startToMoveBigBoss(bigBossData: UfoBigBossData) {
-        handler.postDelayed(object : Runnable{
+        handler.postDelayed(object : Runnable {
             override fun run() {
-                if (bigBossData.boss.y >= 50f){
+                if (bigBossData.boss.y >= 50f) {
                     handler.removeCallbacks(this)
                     return
                 }
                 bigBossData.boss.y = bigBossData.boss.y + 1f
 
-                handler.postDelayed(this,1)
+                handler.postDelayed(this, 1)
             }
 
-        },1)
+        }, 1)
     }
 
     private fun createSmallBoss() {
@@ -240,9 +272,9 @@ class PlayGroundActivity : BaseActivity() {
                     bullet.y = view.y + (view.bottom - view.top)
                     bullet.visibility = View.VISIBLE
                     val data = UfoBulletData(bullet)
-                    ufoBulletList.add(data)
-
-                    moveUFOBullet(data)
+//                    ufoBulletList.add(data)
+//
+//                    moveUFOBullet(data)
                 }
                 handler.removeCallbacks(this)
                 handler.postDelayed(this, 3000)
@@ -356,37 +388,6 @@ class PlayGroundActivity : BaseActivity() {
     }
 
 
-    private fun appearUFO() {
-        handler.postDelayed(object : Runnable {
-            override fun run() {
-                if (isGameOver || bigBossData != null) {
-                    clearAllUFO()
-                    clearUpgradeItem()
-                    handler.removeCallbacks(this)
-                    return
-                }
-                val ufo = this@PlayGroundActivity.getRandomUFOView()
-                dataBinding.root.addView(ufo)
-                ufo.visibility = View.INVISIBLE
-                ufo.post {
-                    ufo.x =
-                        (0..(Tool.getScreenWidth() - (ufo.right - ufo.left))).random().toFloat()
-                    ufo.y = 100f
-                    ufo.tag = ufoIndex
-                    ufo.visibility = View.VISIBLE
-                    val data = UFOData(ufo, isRight = true, isTop = false)
-                    ufoList.add(data)
-                    shootUser(ufo)
-                    moveUFO(data)
-                }
-                ufoIndex++
-                handler.removeCallbacks(this)
-                handler.postDelayed(this, 2000)
-            }
-        }, 2000)
-
-    }
-
     private fun clearUpgradeItem() {
         upgradeItemList.forEach {
             dataBinding.root.removeView(it.updateItem)
@@ -394,121 +395,14 @@ class PlayGroundActivity : BaseActivity() {
         upgradeItemList.clear()
     }
 
-    private fun clearAllUFO() {
-        val ufoIterator = ufoList.iterator()
-        while (ufoIterator.hasNext()) {
-            val data = ufoIterator.next()
-            dataBinding.root.removeView(data.ufo)
-            ufoIterator.remove()
-        }
-    }
-
-    private fun shootUser(ufo: View) {
-
-        handler.postDelayed(object : Runnable {
-            override fun run() {
-                if (isGameOver || bigBossData != null) {
-                    handler.removeCallbacks(this)
-                    return
-                }
-                if (isUFODestroy(ufo)) {
-                    handler.removeCallbacks(this)
-                    return
-                }
-                val bullet = this@PlayGroundActivity.getUFoBullet()
-                dataBinding.root.addView(bullet)
-                bullet.visibility = View.INVISIBLE
-                bullet.post {
-                    bullet.x =
-                        (ufo.x + ((ufo.right - ufo.left) / 2)) - ((bullet.right - bullet.left) / 2)
-                    bullet.y = ufo.y + (ufo.bottom - ufo.top)
-                    bullet.visibility = View.VISIBLE
-                    val data = UfoBulletData(bullet)
-                    ufoBulletList.add(data)
-
-                    moveUFOBullet(data)
-                }
-                handler.removeCallbacks(this)
-                handler.postDelayed(this, 1000)
-            }
-
-        }, 1000)
-
-
-    }
-
-    private fun isUFODestroy(ufo: View): Boolean {
-        var isDestroy = true
-        ufoList.forEach {
-            if (it.ufo.tag == ufo.tag) {
-                isDestroy = false
-            }
-        }
-        return isDestroy
-    }
-
-    //移動UFO的子彈打向玩家
-    private fun moveUFOBullet(bullet: UfoBulletData) {
-
-        handler.postDelayed(object : Runnable {
-            override fun run() {
-                bullet.bulletView.y = bullet.bulletView.y + 10f
-                if (bullet.bulletView.y >= Tool.getScreenHeight()) {
-                    dataBinding.root.removeView(bullet.bulletView)
-                    handler.removeCallbacks(this)
-                    return
-                }
-                if (isHitUser(bullet.bulletView)) {
-                    showGameOver()
-                    MusicTool.stopBgMusic()
-                    MusicTool.playGameOverMusic()
-                    isGameOver = true
-                    dataBinding.root.removeView(bullet.bulletView)
-                    ufoBulletList.remove(bullet)
-                    handler.removeCallbacks(this)
-                    return
-                }
-                handler.removeCallbacks(this)
-                handler.postDelayed(this, 1)
-            }
-        }, 1)
-    }
-
-    private fun showGameOver() {
-        showGameOverDialog(viewModel.scoreLiveData.value!!,
-            object : GameOverDialog.OnGameOverDialogClickListener {
-                override fun onCloseGame() {
-                    finish()
-
-                }
-
-                override fun onRestartGame() {
-                    clearAllBullet()
-                    clearAllBossBullet()
-                    ufoBossList.clear()
-                    isGameOver = false
-                    MusicTool.playBgMusic()
-                    viewModel.reStartScore()
-                    initView()
-                    appearUFO()
-                    startShooting()
-                }
-            })
-    }
 
     private fun clearAllBossBullet() {
-        for(data in bossBulletList){
+        for (data in bossBulletList) {
             dataBinding.root.removeView(data.bulletView)
         }
         bossBulletList.clear()
     }
 
-    private fun clearAllBullet() {
-        ufoBulletList.forEach {
-            dataBinding.root.removeView(it.bulletView)
-        }
-        ufoBulletList.clear()
-    }
 
     private fun isHitUser(bullet: View): Boolean =
         bullet.x >= dataBinding.jet.x &&
@@ -597,7 +491,10 @@ class PlayGroundActivity : BaseActivity() {
                             }
 
                             updateBulletData(view)
-                            if (isCheckBulletHitUFO(view) || isCheckBulletHitBoss(view) || isCheckBulletHitBigBoss(view)){
+                            if (isCheckBulletHitUFO(view) || isCheckBulletHitBoss(view) || isCheckBulletHitBigBoss(
+                                    view
+                                )
+                            ) {
                                 handler.removeCallbacks(this)
                                 return
                             }
@@ -665,27 +562,28 @@ class PlayGroundActivity : BaseActivity() {
                 movePowerfulBulletY(view)
                 when (i) {
                     0 -> {
-                        movePowerfulBulletX(view,false,15)
+                        movePowerfulBulletX(view, false, 15)
                     }
                     1 -> {
-                        movePowerfulBulletX(view,false,35)
+                        movePowerfulBulletX(view, false, 35)
                     }
                     2 -> {
 
                     }
                     3 -> {
-                        movePowerfulBulletX(view,true,35)
+                        movePowerfulBulletX(view, true, 35)
                     }
                     else -> {
-                        movePowerfulBulletX(view,true,15)
+                        movePowerfulBulletX(view, true, 15)
                     }
                 }
             }
             bulletIndex++
         }
         playGunSound()
-        handler.postDelayed(param,500)
+        handler.postDelayed(param, 500)
     }
+
     //移動目前Boss最強子彈的X
     private fun moveBossPowerfulBulletX(view: View, isPlus: Boolean, speed: Int) {
         handler.postDelayed(object : Runnable {
@@ -698,7 +596,7 @@ class PlayGroundActivity : BaseActivity() {
                         return
                     }
                     updateBossBulletData(view)
-                    if (isHitUser(view)){
+                    if (isHitUser(view)) {
                         showGameOver()
                         MusicTool.stopBgMusic()
                         MusicTool.playGameOverMusic()
@@ -717,7 +615,7 @@ class PlayGroundActivity : BaseActivity() {
                     return
                 }
                 updateBossBulletData(view)
-                if (isHitUser(view)){
+                if (isHitUser(view)) {
                     showGameOver()
                     MusicTool.stopBgMusic()
                     MusicTool.playGameOverMusic()
@@ -743,7 +641,10 @@ class PlayGroundActivity : BaseActivity() {
                         return
                     }
                     updateBulletData(view)
-                    if (isCheckBulletHitUFO(view) || isCheckBulletHitBoss(view) || isCheckBulletHitBigBoss(view)){
+                    if (isCheckBulletHitUFO(view) || isCheckBulletHitBoss(view) || isCheckBulletHitBigBoss(
+                            view
+                        )
+                    ) {
                         handler.removeCallbacks(this)
                         return
                     }
@@ -757,7 +658,10 @@ class PlayGroundActivity : BaseActivity() {
                     return
                 }
                 updateBulletData(view)
-                if (isCheckBulletHitUFO(view) || isCheckBulletHitBoss(view) || isCheckBulletHitBigBoss(view)){
+                if (isCheckBulletHitUFO(view) || isCheckBulletHitBoss(view) || isCheckBulletHitBigBoss(
+                        view
+                    )
+                ) {
                     handler.removeCallbacks(this)
                     return
                 }
@@ -774,7 +678,7 @@ class PlayGroundActivity : BaseActivity() {
     /**
      * 檢查是否命中BIG BOSS
      */
-    private fun isCheckBulletHitBigBoss(view: View) : Boolean{
+    private fun isCheckBulletHitBigBoss(view: View): Boolean {
         if (bigBossData == null) {
             return false
         }
@@ -807,7 +711,7 @@ class PlayGroundActivity : BaseActivity() {
     /**
      * 檢查是否命中BOSS
      */
-    private fun isCheckBulletHitBoss(view: View) : Boolean{
+    private fun isCheckBulletHitBoss(view: View): Boolean {
         if (ufoBossList.isEmpty()) {
             return false
         }
@@ -845,8 +749,8 @@ class PlayGroundActivity : BaseActivity() {
         MusicTool.playShootMusic()
     }
 
-    private fun isCheckBulletHitUFO(view: View) : Boolean {
-        val ufoIterator = ufoList.iterator()
+    private fun isCheckBulletHitUFO(view: View): Boolean {
+        val ufoIterator = ufoHandler.ufoList.iterator()
         while (ufoIterator.hasNext()) {
             val ufoData = ufoIterator.next()
             if (view.y >= ufoData.ufo.y &&
@@ -971,6 +875,7 @@ class PlayGroundActivity : BaseActivity() {
             }
         }
     }
+
     //更新BOSS子彈數據
     private fun updateBossBulletData(view: View) {
         bossBulletList.forEach {
