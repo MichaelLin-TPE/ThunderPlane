@@ -6,9 +6,9 @@ class JetHandler {
 
     var jetX : Float = 0f
     var jetY : Float = 0f
-    var jetRight : Float = 0f
-    var jetLeft : Float = 0f
-    var jetTop : Float = 0f
-    var jetBottom : Float = 0f
+    var jetRight : Int = 0
+    var jetLeft : Int = 0
+    var jetTop : Int = 0
+    var jetBottom : Int = 0
 
 }

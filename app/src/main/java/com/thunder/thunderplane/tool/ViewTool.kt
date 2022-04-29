@@ -33,7 +33,7 @@ object ViewTool {
         return view
     }
 
-    fun Activity.getSmallBoss(): View {
+    fun Context.getSmallBoss(): View {
         val list = mutableListOf<Int>()
         list.add(R.drawable.ufo_boss)
         list.add(R.drawable.ufo_boss1)
@@ -56,7 +56,7 @@ object ViewTool {
         return View.inflate(this, R.layout.ufo_bullet_layout, null)
     }
 
-    fun Activity.getBossBullet(): View {
+    fun Context.getBossBullet(): View {
         return View.inflate(this, R.layout.boss_bullet_layout, null)
     }
 

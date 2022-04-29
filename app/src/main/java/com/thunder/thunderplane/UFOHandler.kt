@@ -13,33 +13,32 @@ import com.thunder.thunderplane.tool.Tool
 import com.thunder.thunderplane.tool.ViewTool.getRandomUFOView
 import com.thunder.thunderplane.tool.ViewTool.getUFoBullet
 
-class UFOHandler(val jetHandler: JetHandler,val bigBossHandler: BigBossHandler) {
+class UFOHandler(val jetHandler: JetHandler, val bigBossHandler: BigBossHandler) {
 
     private var ufoIndex = 0
     private val handler = android.os.Handler(Looper.myLooper()!!)
     val ufoList = ArrayList<UFOData>()
     private lateinit var root: ConstraintLayout
-    private val ufoBulletList = ArrayList<UfoBulletData>()
+    val ufoBulletList = ArrayList<UfoBulletData>()
     private lateinit var onShowGameOverListener: OnShowGameOverListener
 
-    public fun setOnShowGameOverListener(showGameOverListener: OnShowGameOverListener){
+    fun setOnShowGameOverListener(showGameOverListener: OnShowGameOverListener) {
         onShowGameOverListener = showGameOverListener
     }
 
-    private fun getContext() : Context {
+    private fun getContext(): Context {
         return MyApplication.instance.applicationContext
     }
 
     /**
      * 開始產生UFO
      */
-    fun appearUfo(root : ConstraintLayout){
+    fun appearUfo(root: ConstraintLayout) {
         this.root = root
         handler.postDelayed(object : Runnable {
             override fun run() {
                 if (jetHandler.isGameOver || bigBossHandler.bigBossData != null) {
                     clearAllUFO(root)
-                    clearUpgradeItem()
                     handler.removeCallbacks(this)
                     return
                 }
@@ -151,7 +150,7 @@ class UFOHandler(val jetHandler: JetHandler,val bigBossHandler: BigBossHandler) 
     /**
      * 移動UFO子彈
      */
-    private fun moveUFOBullet(bullet: UfoBulletData) {
+    fun moveUFOBullet(bullet: UfoBulletData) {
         handler.postDelayed(object : Runnable {
             override fun run() {
                 bullet.bulletView.y = bullet.bulletView.y + 10f
@@ -206,13 +205,6 @@ class UFOHandler(val jetHandler: JetHandler,val bigBossHandler: BigBossHandler) 
     }
 
     /**
-     * 清除所有升級箱子 但是這個不應該在這
-     */
-    private fun clearUpgradeItem() {
-
-    }
-
-    /**
      * 清除所有UFO
      */
     private fun clearAllUFO(root: ConstraintLayout) {
@@ -224,8 +216,15 @@ class UFOHandler(val jetHandler: JetHandler,val bigBossHandler: BigBossHandler) 
         }
     }
 
+    fun clearAllBullet() {
+        ufoBulletList.forEach {
+            root.removeView(it.bulletView)
+        }
+        ufoBulletList.clear()
+    }
 
-    fun interface OnShowGameOverListener{
+
+    fun interface OnShowGameOverListener {
         fun onShowGameOver()
     }
 
