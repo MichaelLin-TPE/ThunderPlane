@@ -5,13 +5,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
-        android:id="@+id/boss"
+        android:id="@+id/left_wing"
         android:contentDescription="@null"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:src="@drawable/big_boss1"
-        android:layout_width="300dp"
-        android:layout_height="300dp"/>
+        android:src="@drawable/left_wing"
+        android:layout_width="20dp"
+        android:layout_height="230dp"/>
+
+    <ImageView
+        android:id="@+id/center_object"
+        android:layout_width="190dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="9dp"
+        android:contentDescription="@null"
+        android:src="@drawable/center_object"
+        app:layout_constraintLeft_toRightOf="@id/left_wing"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/right_wing"
+        android:contentDescription="@null"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/center_object"
+        android:src="@drawable/right_wing"
+        android:layout_width="20dp"
+        android:layout_height="230dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

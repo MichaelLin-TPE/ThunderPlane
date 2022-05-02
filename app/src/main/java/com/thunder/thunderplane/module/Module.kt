@@ -1,15 +1,14 @@
 package com.thunder.thunderplane.module
 
-import com.thunder.thunderplane.BigBossHandler
-import com.thunder.thunderplane.JetHandler
-import com.thunder.thunderplane.SmallBossHandler
-import com.thunder.thunderplane.UFOHandler
+import com.thunder.thunderplane.*
 import org.koin.dsl.module
-import kotlin.math.sin
+
 
 val appModule = module {
-    single { BigBossHandler() }
     single { JetHandler() }
-    single { UFOHandler(get(), get()) }
-    single { SmallBossHandler(get(),get()) }
+    single { BigBossHandler(get() as JetHandler) }
+    single { UFOHandler(get() as JetHandler, get() as BigBossHandler) }
+    single { SmallBossHandler(get() as JetHandler, get() as UFOHandler) }
+    single { BackgroundHandler(get() as JetHandler) }
+
 }

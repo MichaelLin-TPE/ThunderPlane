@@ -16,7 +16,7 @@ class SmallBossHandler(val jetHandler: JetHandler,val ufoHandler: UFOHandler) {
 
     private lateinit var root: ConstraintLayout
     val ufoBossList = ArrayList<UfoBossData>()
-    private val handler = Handler(Looper.myLooper()!!)
+    private lateinit var handler: Handler
     private var bossIndex = 0
 
     private fun getContext(): Context {
@@ -140,5 +140,9 @@ class SmallBossHandler(val jetHandler: JetHandler,val ufoHandler: UFOHandler) {
                 handler.postDelayed(this, 1)
             }
         }, 1)
+    }
+
+    fun setHandler(handler: Handler) {
+        this.handler = handler
     }
 }

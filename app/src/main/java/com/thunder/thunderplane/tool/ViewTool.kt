@@ -1,12 +1,9 @@
 package com.thunder.thunderplane.tool
 
-import android.app.Activity
 import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import com.thunder.thunderplane.R
-import com.thunder.thunderplane.tool.ViewTool.getJetBullet
-import com.thunder.thunderplane.tool.ViewTool.getRandomUFOView
 
 object ViewTool {
 
@@ -16,7 +13,7 @@ object ViewTool {
     private const val BULLET_LEVEL_4 = 4444
     const val BULLET_LEVEL_5 = 555
 
-    fun Activity.getUpgradeItem(): View {
+    fun Context.getUpgradeItem(): View {
         return View.inflate(this, R.layout.upgrade_item_layout, null)
     }
 
@@ -42,13 +39,8 @@ object ViewTool {
         img.setImageResource(list[(0 until list.size).random()])
         return view
     }
-    fun Activity.getBigBoss(): View {
-        val list = mutableListOf<Int>()
-        list.add(R.drawable.big_boss1)
-        val view = View.inflate(this, R.layout.ufo_big_boss_layout, null)
-        val img = view.findViewById<ImageView>(R.id.boss)
-        img.setImageResource(list[(0 until list.size).random()])
-        return view
+    fun Context.getBigBoss(): View {
+        return View.inflate(this, R.layout.ufo_big_boss_layout, null)
     }
 
 
@@ -60,7 +52,7 @@ object ViewTool {
         return View.inflate(this, R.layout.boss_bullet_layout, null)
     }
 
-    fun Activity.getJetBullet(tag: Any): View {
+    fun Context.getJetBullet(tag: Any): View {
         return when (tag) {
             BULLET_LEVEL_1 -> {
                 View.inflate(this, R.layout.bullet_layout, null)
@@ -80,7 +72,7 @@ object ViewTool {
         }
     }
 
-    fun Activity.getExplodeView(): View {
+    fun Context.getExplodeView(): View {
         return View.inflate(this, R.layout.explode_layout, null)
     }
 

@@ -1,12 +1,12 @@
 package com.thunder.thunderplane
 
 import android.content.Context
+import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.thunder.thunderplane.base.MyApplication
 import com.thunder.thunderplane.bean.UFOData
-import com.thunder.thunderplane.bean.UfoBossData
 import com.thunder.thunderplane.bean.UfoBulletData
 import com.thunder.thunderplane.tool.MusicTool
 import com.thunder.thunderplane.tool.Tool
@@ -16,7 +16,7 @@ import com.thunder.thunderplane.tool.ViewTool.getUFoBullet
 class UFOHandler(val jetHandler: JetHandler, val bigBossHandler: BigBossHandler) {
 
     private var ufoIndex = 0
-    private val handler = android.os.Handler(Looper.myLooper()!!)
+    private lateinit var handler: Handler
     val ufoList = ArrayList<UFOData>()
     private lateinit var root: ConstraintLayout
     val ufoBulletList = ArrayList<UfoBulletData>()
@@ -221,6 +221,10 @@ class UFOHandler(val jetHandler: JetHandler, val bigBossHandler: BigBossHandler)
             root.removeView(it.bulletView)
         }
         ufoBulletList.clear()
+    }
+
+    fun setHandler(handler: Handler) {
+        this.handler = handler
     }
 
 
