@@ -12,6 +12,8 @@ import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.thunder.thunderplane.base.BaseActivity;
+import com.thunder.thunderplane.level_page.LevelActivity;
+import com.thunder.thunderplane.playground.PlayGroundActivity;
 import com.thunder.thunderplane.tool.MusicTool;
 import com.thunder.thunderplane.tool.Tool;
 
@@ -51,7 +53,7 @@ public class LauncherActivity extends BaseActivity {
         tvPlayGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(LauncherActivity.this,PlayGroundActivity.class);
+                Intent intent = new Intent(LauncherActivity.this, LevelActivity.class);
                 startActivity(intent);
             }
         });
@@ -75,7 +77,7 @@ public class LauncherActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        MusicTool.INSTANCE.playLaunchMusic();
+//        MusicTool.INSTANCE.playLaunchMusic();
     }
 
     @Override

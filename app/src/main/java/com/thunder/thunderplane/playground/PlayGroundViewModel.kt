@@ -1,4 +1,4 @@
-package com.thunder.thunderplane
+package com.thunder.thunderplane.playground
 
 import androidx.lifecycle.*
 import com.thunder.thunderplane.bean.JetMoveData
@@ -16,6 +16,7 @@ class PlayGroundViewModel(val repository: PlayGroundRepository) : ViewModel() {
     val moveJetLiveData: LiveData<JetMoveData> = _moveJetLiveData
     private var jetX = 0f
     private var jetY = 0f
+    private var point = 0L
 
     private val _scoreLiveData = MutableLiveData<Long>(0)
     private val currentScore get() =  _scoreLiveData.value!!
@@ -75,19 +76,18 @@ class PlayGroundViewModel(val repository: PlayGroundRepository) : ViewModel() {
     fun onCreateSmallBoss() {
         viewModelScope.launch(Dispatchers.IO) {
             while (isActive){
-                if (currentScore != 0L && currentScore >= 1000){
-                    MichaelLog.i("顯示大BOSS")
+                if (currentScore != 0L && currentScore >= 10000){
                     viewModelScope.launch(Dispatchers.Main) {
                         _createBigBossLiveData.value = true
                     }
                     break
                 }
-                if (currentScore != 0L && currentScore % 500 == 0L){
+                if (currentScore != 0L && currentScore % 500 == 0L && point != currentScore){
+                    point = currentScore
                     viewModelScope.launch(Dispatchers.Main) {
                         _createSmallBossLiveData.value = true
                         _scoreLiveData.value = currentScore + 100
                     }
-                    delay(1000)
                     continue
                 }
                 delay(50)

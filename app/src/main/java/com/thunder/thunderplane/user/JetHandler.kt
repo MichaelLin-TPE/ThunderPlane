@@ -1,23 +1,28 @@
-package com.thunder.thunderplane
+package com.thunder.thunderplane.user
 
 import android.content.Context
 import android.os.Handler
-import android.os.Looper
-import android.util.Log
+
 import android.view.View
 import android.view.animation.AlphaAnimation
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.thunder.thunderplane.R
+import com.thunder.thunderplane.small_boss.SmallBossHandler
+import com.thunder.thunderplane.ufo.UFOHandler
 import com.thunder.thunderplane.base.MyApplication
 import com.thunder.thunderplane.bean.BulletData
 import com.thunder.thunderplane.bean.UpgradeItemData
+import com.thunder.thunderplane.big_boss.BigBossHandler
 import com.thunder.thunderplane.log.MichaelLog
 import com.thunder.thunderplane.tool.MusicTool
 import com.thunder.thunderplane.tool.Tool
 import com.thunder.thunderplane.tool.ViewTool
 import com.thunder.thunderplane.tool.ViewTool.getExplodeView
 import com.thunder.thunderplane.tool.ViewTool.getJetBullet
+import com.thunder.thunderplane.tool.ViewTool.getSmallExplodeView
 import com.thunder.thunderplane.tool.ViewTool.getUpgradeItem
 import kotlinx.coroutines.*
+import java.nio.channels.FileLock
 import kotlin.coroutines.CoroutineContext
 
 class JetHandler {
@@ -42,7 +47,11 @@ class JetHandler {
     private lateinit var bigBossHandler: BigBossHandler
 
 
-    fun setUFOData(ufoHandler: UFOHandler,smallBossHandler: SmallBossHandler,bigBossHandler: BigBossHandler){
+    fun setUFOData(
+        ufoHandler: UFOHandler,
+        smallBossHandler: SmallBossHandler,
+        bigBossHandler: BigBossHandler
+    ) {
         this.ufoHandler = ufoHandler
         this.smallBossHandler = smallBossHandler
         this.bigBossHandler = bigBossHandler
@@ -105,7 +114,10 @@ class JetHandler {
                             }
 
                             updateBulletData(view)
-                            if (isCheckBulletHitUFO(view) || isCheckBulletHitBoss(view) || isCheckBulletHitBigBoss(view)) {
+                            if (isCheckBulletHitUFO(view) || isCheckBulletHitBoss(view) || isCheckBulletHitBigBoss(
+                                    view
+                                )
+                            ) {
                                 handler.removeCallbacks(this)
                                 return
                             }
@@ -148,7 +160,6 @@ class JetHandler {
                         movePowerfulBulletX(view, false, 35)
                     }
                     2 -> {
-
                     }
                     3 -> {
                         movePowerfulBulletX(view, true, 35)
@@ -162,6 +173,7 @@ class JetHandler {
         }
         playGunSound()
         handler.postDelayed(param, 500)
+
     }
 
     //移動目前最強子彈的X
@@ -176,13 +188,13 @@ class JetHandler {
                         return
                     }
                     updateBulletData(view)
-                    if (isCheckBulletHitUFO(view) || isCheckBulletHitBoss(view) || isCheckBulletHitBigBoss(
-                            view
-                        )
-                    ) {
-                        handler.removeCallbacks(this)
-                        return
-                    }
+//                    if (isCheckBulletHitUFO(view) || isCheckBulletHitBoss(view) || isCheckBulletHitBigBoss(
+//                            view
+//                        )
+//                    ) {
+//                        handler.removeCallbacks(this)
+//                        return
+//                    }
                     handler.postDelayed(this, speed.toLong())
                     return
                 }
@@ -193,13 +205,13 @@ class JetHandler {
                     return
                 }
                 updateBulletData(view)
-                if (isCheckBulletHitUFO(view) || isCheckBulletHitBoss(view) || isCheckBulletHitBigBoss(
-                        view
-                    )
-                ) {
-                    handler.removeCallbacks(this)
-                    return
-                }
+//                if (isCheckBulletHitUFO(view) || isCheckBulletHitBoss(view) || isCheckBulletHitBigBoss(
+//                        view
+//                    )
+//                ) {
+//                    handler.removeCallbacks(this)
+//                    return
+//                }
                 handler.postDelayed(this, speed.toLong())
             }
         }, speed.toLong())
@@ -210,24 +222,41 @@ class JetHandler {
      */
     private fun isCheckBulletHitBigBoss(view: View): Boolean {
         if (bigBossHandler.bigBossData == null) {
-            MichaelLog.i("沒有打BOSS")
             return false
         }
-        if (view.y >= bigBossHandler.bigBossData!!.boss.y &&
-            view.y <= (bigBossHandler.bigBossData!!.boss.y + (bigBossHandler.bigBossData!!.boss.bottom - bigBossHandler.bigBossData!!.boss.top)) &&
-            view.x >= bigBossHandler.bigBossData!!.boss.x &&
-            view.x <= (bigBossHandler.bigBossData!!.boss.x + (bigBossHandler.bigBossData!!.boss.right - bigBossHandler.bigBossData!!.boss.left))
+
+        if (isHitLeftWing(view.y, view.x) || isHitRightWing(view.y, view.x) || isHitBody(
+                view.y,
+                view.x
+            )
         ) {
             if (bigBossHandler.bigBossData!!.hp > 0) {
-                MichaelLog.i("命中大BOSS")
                 MichaelLog.i("boss hp : ${bigBossHandler.bigBossData!!.hp}")
-                deleteBullet(view)
+
                 bigBossHandler.bigBossData!!.hp =
                     bigBossHandler.bigBossData!!.hp - ViewTool.getDamage(level)
-                val alphaAnimation = AlphaAnimation(1.0f, 0.2f)
-                alphaAnimation.duration = 100
-                alphaAnimation.fillAfter = false
-                bigBossHandler.bigBossData!!.boss.startAnimation(alphaAnimation)
+
+                val explode = getContext().getSmallExplodeView()
+                root.addView(explode)
+                explode.visibility = View.INVISIBLE
+                explode.post {
+                    val explodeWidth = explode.right - explode.left
+                    val explodeHeight = explode.bottom - explode.top
+                    val bulletWidth = view.right - view.left
+                    explode.x = view.x - ((explodeWidth - bulletWidth) / 2)
+                    explode.y = view.y - explodeHeight
+                    explode.visibility = View.VISIBLE
+                    handler.postDelayed({
+                        root.removeView(explode)
+                    },1000)
+                    deleteBullet(view)
+                }
+
+//                deleteBullet(view)
+//                val alphaAnimation = AlphaAnimation(1.0f, 0.5f)
+//                alphaAnimation.duration = 100
+//                alphaAnimation.fillAfter = false
+//                bigBossHandler.bigBossData!!.boss.startAnimation(alphaAnimation)
                 return true
             }
             createRandomUpgradeItem(view.x, view.y)
@@ -235,6 +264,58 @@ class JetHandler {
             root.removeView(bigBossHandler.bigBossData!!.boss)
             deleteBullet(view)
             onAddScoreListener.onAddScore(1000)
+            return true
+        }
+        return false
+    }
+
+    private fun isHitBody(y: Float, x: Float): Boolean {
+        if (bigBossHandler.bigBossData?.body == null) {
+            return false
+        }
+        val bodyLocation = intArrayOf(0, 0)
+        bigBossHandler.bigBossData!!.body.getLocationOnScreen(bodyLocation)
+
+        val bodyX = bodyLocation[0]
+        val bodyY = bodyLocation[1]
+
+        if (y <= (bodyY + (bigBossHandler.bigBossData!!.body.bottom - bigBossHandler.bigBossData!!.body.top)) &&
+            x >= bodyX && x <= (bodyX + (bigBossHandler.bigBossData!!.body.right - bigBossHandler.bigBossData!!.body.left))
+        ) {
+            return true
+        }
+        return false
+    }
+
+    private fun isHitRightWing(y: Float, x: Float): Boolean {
+        if (bigBossHandler.bigBossData?.rightWing == null) {
+            return false
+        }
+        val rightWingLocation = intArrayOf(0, 0)
+        bigBossHandler.bigBossData!!.rightWing.getLocationOnScreen(rightWingLocation)
+
+        val rightWingX = rightWingLocation[0]
+        val rightWingY = rightWingLocation[1]
+        if (y <= (rightWingY + (bigBossHandler.rightWing!!.bottom - bigBossHandler.rightWing!!.top)) &&
+            x >= rightWingX && x <= (rightWingX + (bigBossHandler.rightWing!!.right - bigBossHandler.rightWing!!.left))
+        ) {
+            return true
+        }
+        return false
+    }
+
+    private fun isHitLeftWing(y: Float, x: Float): Boolean {
+        if (bigBossHandler.bigBossData?.leftWing == null) {
+            return false
+        }
+        val leftWingLocation = intArrayOf(0, 0)
+        bigBossHandler.bigBossData!!.leftWing.getLocationOnScreen(leftWingLocation)
+
+        val leftWingX = leftWingLocation[0]
+        val rightWingY = leftWingLocation[1]
+        if (y <= (rightWingY + (bigBossHandler.leftWing!!.bottom - bigBossHandler.leftWing!!.top)) &&
+            x >= leftWingX && x <= (leftWingX + (bigBossHandler.leftWing!!.right - bigBossHandler.leftWing!!.left))
+        ) {
             return true
         }
         return false
@@ -433,6 +514,13 @@ class JetHandler {
                 view.y = view.y - 15f
                 if (view.y <= 0) {
                     root.removeView(view)
+                    handler.removeCallbacks(this)
+                    return
+                }
+                if (isCheckBulletHitUFO(view) || isCheckBulletHitBoss(view) || isCheckBulletHitBigBoss(
+                        view
+                    )
+                ) {
                     handler.removeCallbacks(this)
                     return
                 }

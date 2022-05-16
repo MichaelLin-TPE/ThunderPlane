@@ -1,4 +1,4 @@
-package com.thunder.thunderplane
+package com.thunder.thunderplane.bean
 
 import android.view.View
 

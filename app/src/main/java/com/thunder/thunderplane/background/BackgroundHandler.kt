@@ -1,12 +1,13 @@
-package com.thunder.thunderplane
+package com.thunder.thunderplane.background
 
 import android.content.Context
 import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.widget.LinearLayout
 import com.thunder.thunderplane.base.MyApplication
+import com.thunder.thunderplane.bean.BgData
 import com.thunder.thunderplane.tool.Tool
+import com.thunder.thunderplane.user.JetHandler
 import com.thunder.thunderplane.wedgit.NotScrollNestedScrollView
 import com.thunder.thunderplane.wedgit.RandomBgView
 
@@ -49,10 +50,11 @@ class BackgroundHandler(private val jetHandler: JetHandler) {
                                 handler.postDelayed(this, 1)
                             }
                         }, 1)
+                        onBackgroundFinishListener.onFinish()
                     }
                 }
             }
-            onBackgroundFinishListener.onFinish()
+
         }
     }
 

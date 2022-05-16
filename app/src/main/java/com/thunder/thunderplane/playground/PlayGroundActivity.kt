@@ -1,4 +1,4 @@
-package com.thunder.thunderplane
+package com.thunder.thunderplane.playground
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -8,13 +8,19 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
+import com.thunder.thunderplane.R
+import com.thunder.thunderplane.background.BackgroundHandler
 import com.thunder.thunderplane.base.BaseActivity
+import com.thunder.thunderplane.big_boss.BigBossHandler
 import com.thunder.thunderplane.databinding.ActivityMainBinding
 import com.thunder.thunderplane.dialog.GameOverDialog
 import com.thunder.thunderplane.log.MichaelLog
+import com.thunder.thunderplane.small_boss.SmallBossHandler
 import com.thunder.thunderplane.tool.MusicTool
 import com.thunder.thunderplane.tool.ViewTool.BULLET_LEVEL_1
-import kotlinx.android.synthetic.main.activity_main.*
+import com.thunder.thunderplane.tool.ViewTool.BULLET_LEVEL_5
+import com.thunder.thunderplane.ufo.UFOHandler
+import com.thunder.thunderplane.user.JetHandler
 import org.koin.android.ext.android.inject
 
 
@@ -65,12 +71,7 @@ class PlayGroundActivity : BaseActivity() {
 
         initView()
 
-
-
         dataBinding.root.setOnTouchListener(onTouchListener)
-
-
-
 
         //移動飛機
         viewModel.moveJetLiveData.observe(this) {
@@ -99,11 +100,9 @@ class PlayGroundActivity : BaseActivity() {
         }
 
         viewModel.createBigBossLiveData.observe(this) {
-            MichaelLog.i("isShowBoss : $it")
             if (!it) {
                 return@observe
             }
-            MichaelLog.i("isShowBoss $it")
             bigBossHandler.createBigBoss(dataBinding.root)
 
         }
@@ -149,10 +148,9 @@ class PlayGroundActivity : BaseActivity() {
 
         //背景處理完才會開始
         backgroundHandler.startToMoveBackground(dataBinding.bgRoot, dataBinding.scrollView){
-            MichaelLog.i("背影完成")
             //一開始飛機的子彈為最小化
             jetHandler.setUFOData(ufoHandler,smallBossHandler,bigBossHandler)
-            jetHandler.setJetBulletLevel(BULLET_LEVEL_1)
+            jetHandler.setJetBulletLevel(BULLET_LEVEL_5)
 
 
             //產生UFO
@@ -180,8 +178,9 @@ class PlayGroundActivity : BaseActivity() {
 
 
     override fun onDestroy() {
-        super.onDestroy()
         MusicTool.releaseAllMusic()
+        jetHandler.isGameOver = false
+        super.onDestroy()
     }
 
 

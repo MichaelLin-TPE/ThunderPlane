@@ -11,6 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ThunderPlane">
         <activity
+            android:name=".level_page.LevelActivity"
+            android:exported="false" />
+        <activity
             android:name=".LauncherActivity"
             android:exported="true">
             <intent-filter>
@@ -20,9 +23,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PlayGroundActivity"
-            android:exported="true">
-        </activity>
+            android:name=".playground.PlayGroundActivity"
+            android:exported="true"></activity>
     </application>
 
 </manifest>

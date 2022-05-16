@@ -1,18 +1,19 @@
-package com.thunder.thunderplane
+package com.thunder.thunderplane.small_boss
 
 import android.content.Context
 import android.os.Handler
-import android.os.Looper
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.thunder.thunderplane.ufo.UFOHandler
 import com.thunder.thunderplane.base.MyApplication
 import com.thunder.thunderplane.bean.UfoBossData
 import com.thunder.thunderplane.bean.UfoBulletData
 import com.thunder.thunderplane.tool.Tool
 import com.thunder.thunderplane.tool.ViewTool.getBossBullet
 import com.thunder.thunderplane.tool.ViewTool.getSmallBoss
+import com.thunder.thunderplane.user.JetHandler
 
-class SmallBossHandler(val jetHandler: JetHandler,val ufoHandler: UFOHandler) {
+class SmallBossHandler(val jetHandler: JetHandler, val ufoHandler: UFOHandler) {
 
     private lateinit var root: ConstraintLayout
     val ufoBossList = ArrayList<UfoBossData>()

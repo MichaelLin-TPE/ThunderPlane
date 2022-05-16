@@ -75,6 +75,7 @@ object ViewTool {
     fun Context.getExplodeView(): View {
         return View.inflate(this, R.layout.explode_layout, null)
     }
+    fun Context.getSmallExplodeView():View = View.inflate(this,R.layout.small_explode_layout,null)
 
     fun upgradeBulletLevel(tag: Any): Int {
         return when (tag) {

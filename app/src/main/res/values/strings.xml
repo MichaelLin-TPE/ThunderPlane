@@ -9,4 +9,15 @@
     <string name="play_game">開始遊戲</string>
     <string name="setting">設定</string>
     <string name="close_game">結束遊戲</string>
+    <string name="first_level">天鵝座</string>
+    <string name="second_level">天鷹座</string>
+    <string name="third_level">狐狸座</string>
+    <string name="fourth_level">天箭座</string>
+    <string name="fifth_level">蛇夫座</string>
+    <string name="sixth_level">盾牌座</string>
+    <string name="seventh_level">人馬座</string>
+    <string name="eighth_level">天蠍座</string>
+    <string name="night_level">天壇座</string>
+    <string name="ten_level">矩尺座</string>
+
 </resources>

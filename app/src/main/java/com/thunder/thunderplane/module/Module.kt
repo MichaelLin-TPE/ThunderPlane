@@ -1,6 +1,10 @@
 package com.thunder.thunderplane.module
 
-import com.thunder.thunderplane.*
+import com.thunder.thunderplane.background.BackgroundHandler
+import com.thunder.thunderplane.big_boss.BigBossHandler
+import com.thunder.thunderplane.small_boss.SmallBossHandler
+import com.thunder.thunderplane.ufo.UFOHandler
+import com.thunder.thunderplane.user.JetHandler
 import org.koin.dsl.module
 
 

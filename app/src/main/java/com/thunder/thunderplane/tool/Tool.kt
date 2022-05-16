@@ -4,7 +4,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.util.TypedValue
 import android.view.View
-import android.view.animation.DecelerateInterpolator
+import android.view.animation.*
 import com.thunder.thunderplane.base.MyApplication
 import com.thunder.thunderplane.R
 import com.thunder.thunderplane.log.MichaelLog
@@ -77,5 +77,13 @@ object Tool {
         valueAnimator.start()
         view.visibility = View.VISIBLE
     }
+    fun startRotate(view : View,toDegree : Float){
+        val animation = RotateAnimation(0f,toDegree,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f)
+        animation.repeatCount = Animation.INFINITE
+        animation.interpolator = LinearInterpolator()
+        animation.duration = 5000
+        view.startAnimation(animation)
+    }
+
 
 }

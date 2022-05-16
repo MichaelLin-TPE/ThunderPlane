@@ -1,17 +1,18 @@
-package com.thunder.thunderplane
+package com.thunder.thunderplane.ufo
 
 import android.content.Context
 import android.os.Handler
-import android.os.Looper
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.thunder.thunderplane.base.MyApplication
 import com.thunder.thunderplane.bean.UFOData
 import com.thunder.thunderplane.bean.UfoBulletData
+import com.thunder.thunderplane.big_boss.BigBossHandler
 import com.thunder.thunderplane.tool.MusicTool
 import com.thunder.thunderplane.tool.Tool
 import com.thunder.thunderplane.tool.ViewTool.getRandomUFOView
 import com.thunder.thunderplane.tool.ViewTool.getUFoBullet
+import com.thunder.thunderplane.user.JetHandler
 
 class UFOHandler(val jetHandler: JetHandler, val bigBossHandler: BigBossHandler) {
 

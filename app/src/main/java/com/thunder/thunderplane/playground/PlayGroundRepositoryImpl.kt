@@ -1,4 +1,4 @@
-package com.thunder.thunderplane
+package com.thunder.thunderplane.playground
 
 class PlayGroundRepositoryImpl : PlayGroundRepository {
 

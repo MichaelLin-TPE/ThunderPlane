@@ -1,11 +1,13 @@
-package com.thunder.thunderplane
+package com.thunder.thunderplane.big_boss
 
 import android.content.Context
 import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.thunder.thunderplane.user.JetHandler
+import com.thunder.thunderplane.R
+import com.thunder.thunderplane.ufo.UFOHandler
 import com.thunder.thunderplane.base.MyApplication
 import com.thunder.thunderplane.bean.BulletData
 import com.thunder.thunderplane.bean.UfoBigBossData
@@ -42,18 +44,19 @@ class BigBossHandler(private val jetHandler: JetHandler) {
         this.root = root
         val view = getContext().getBigBoss()
         view.visibility = View.INVISIBLE
-        rightWing = view.findViewById(R.id.right_wing)
-        leftWing = view.findViewById(R.id.left_wing)
-        centerObject = view.findViewById(R.id.center_object)
+
         root.addView(view)
         view.post {
             view.x = ((Tool.getScreenWidth() - (view.right - view.left)) / 2).toFloat()
             view.y = 0f - (view.bottom - view.top)
             MichaelLog.i("已顯示大BOSS : x : ${view.x} y : ${view.y}")
             view.visibility = View.VISIBLE
-            bigBossData = UfoBigBossData(view)
+            rightWing = view.findViewById(R.id.right_wing)
+            leftWing = view.findViewById(R.id.left_wing)
+            centerObject = view.findViewById(R.id.center_object)
+            bigBossData = UfoBigBossData(view,20000,leftWing!!,rightWing!!,centerObject!!)
             startToMoveBigBoss(bigBossData!!)
-            startToShootUser()
+//            startToShootUser()
         }
     }
 
@@ -214,6 +217,9 @@ class BigBossHandler(private val jetHandler: JetHandler) {
                     return
                 }
                 bigBossData.boss.y = bigBossData.boss.y + 1f
+                bigBossData.leftWing = bigBossData.boss.findViewById(R.id.left_wing)
+                bigBossData.rightWing = bigBossData.boss.findViewById(R.id.right_wing)
+                bigBossData.body = bigBossData.boss.findViewById(R.id.center_object)
 
                 handler.postDelayed(this, 1)
             }
